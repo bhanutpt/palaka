@@ -1,13 +1,45 @@
 :root {
+  color-scheme: light;
   --bg: #fbfaf7;
   --panel: #f0eee8;
   --text: #1d1b16;
-  --muted: #6b675d;
+  --muted: #605c52;
   --accent: #1f6f5c;
+  --on-accent: #ffffff;
   --warning: #a4380b;
   --border: #d9d5ca;
-  --telugu-font: 'Noto Sans Telugu', 'Nirmala UI', 'Gautami', sans-serif;
+  --selection: #cfe6de;
+  --telugu-font: 'Noto Sans Telugu Variable', sans-serif;
   --editor-size: 20px;
+}
+
+/* Dark palette: chosen by the setting, or by the system when the setting says so. */
+:root[data-theme='dark'] {
+  color-scheme: dark;
+  --bg: #1b1c1a;
+  --panel: #252724;
+  --text: #ecebe6;
+  --muted: #a9a79e;
+  --accent: #6fcdb4;
+  --on-accent: #10201b;
+  --warning: #ffb08a;
+  --border: #3b3e39;
+  --selection: #2f4f46;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme]) {
+    color-scheme: dark;
+    --bg: #1b1c1a;
+    --panel: #252724;
+    --text: #ecebe6;
+    --muted: #a9a79e;
+    --accent: #6fcdb4;
+    --on-accent: #10201b;
+    --warning: #ffb08a;
+    --border: #3b3e39;
+    --selection: #2f4f46;
+  }
 }
 
 * {
@@ -23,11 +55,11 @@ body {
 body {
   display: grid;
   grid-template-rows: auto 1fr auto;
-  grid-template-columns: minmax(0, 1fr) minmax(320px, 30%);
+  grid-template-columns: auto minmax(0, 1fr) minmax(320px, 30%);
   grid-template-areas:
-    'toolbar toolbar'
-    'editor chart'
-    'status status';
+    'toolbar toolbar toolbar'
+    'documents editor chart'
+    'status status status';
   background: var(--bg);
   color: var(--text);
   font-family: system-ui, var(--telugu-font);
@@ -37,7 +69,8 @@ body {
   grid-area: toolbar;
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: 8px;
+  overflow-x: auto;
   padding: 6px 16px;
   background: var(--panel);
   border-bottom: 1px solid var(--border);
@@ -49,13 +82,19 @@ body {
   color: var(--accent);
 }
 
-#toolbar button {
+#toolbar h1 {
+  margin-right: 8px;
+}
+
+#toolbar button,
+#settings button {
   padding: 4px 12px;
   border: 1px solid var(--border);
   border-radius: 6px;
   background: var(--bg);
   color: var(--text);
-  font: 15px var(--telugu-font);
+  font: 14px system-ui, var(--telugu-font);
+  white-space: nowrap;
   cursor: pointer;
 }
 
@@ -138,11 +177,11 @@ body {
 }
 
 body.chart-hidden {
-  grid-template-columns: minmax(0, 1fr);
+  grid-template-columns: auto minmax(0, 1fr);
   grid-template-areas:
-    'toolbar'
-    'editor'
-    'status';
+    'toolbar toolbar'
+    'documents editor'
+    'status status';
 }
 
 body.chart-hidden #chart {
@@ -201,7 +240,8 @@ body.chart-hidden #chart {
   background: var(--bg);
   color: var(--text);
   cursor: pointer;
-  transition: background-color 0.12s, border-color 0.12s, opacity 0.12s;
+  /* Only the search dimming is animated; colours must switch at once with the theme. */
+  transition: opacity 0.12s;
 }
 
 .tile:hover {
@@ -240,11 +280,11 @@ body.chart-hidden #chart {
 .tile.is-typed {
   background: var(--accent);
   border-color: var(--accent);
-  color: #fff;
+  color: var(--on-accent);
 }
 
 .tile.is-typed .tile-key {
-  color: #fff;
+  color: var(--on-accent);
 }
 
 .chart-guninta {
@@ -277,18 +317,25 @@ body.chart-hidden #chart {
 
 /* Narrow screens: the chart sits under the editor. The sliding drawer comes in phase 6. */
 @media (max-width: 800px) {
-  body {
+  body,
+  body.chart-hidden {
     grid-template-columns: minmax(0, 1fr);
-    grid-template-rows: auto 1fr minmax(0, 45vh) auto;
+    grid-template-rows: auto auto 1fr minmax(0, 45vh) auto;
     grid-template-areas:
       'toolbar'
+      'documents'
       'editor'
       'chart'
       'status';
   }
 
   body.chart-hidden {
-    grid-template-rows: auto 1fr auto;
+    grid-template-rows: auto auto 1fr auto;
+    grid-template-areas:
+      'toolbar'
+      'documents'
+      'editor'
+      'status';
   }
 
   #chart {
@@ -296,7 +343,163 @@ body.chart-hidden #chart {
     border-top: 1px solid var(--border);
   }
 
-  #status-cursor {
+  #documents {
+    width: auto;
+    max-height: 40vh;
+    border-right: 0;
+    border-bottom: 1px solid var(--border);
+  }
+
+  #status-cursor,
+  #status-counts {
     display: none;
   }
+}
+
+/* Editor colours that follow the theme */
+
+#editor .cm-content {
+  caret-color: var(--text);
+}
+
+#editor .cm-cursor {
+  border-left-color: var(--text);
+}
+
+#editor .cm-selectionBackground,
+#editor .cm-focused .cm-selectionBackground {
+  background: var(--selection);
+}
+
+/* Documents */
+
+#documents {
+  grid-area: documents;
+  width: 240px;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 0 12px 12px;
+  border-right: 1px solid var(--border);
+  background: var(--bg);
+}
+
+.doc-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.doc-item {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  gap: 0 8px;
+  padding: 6px 8px;
+  border: 1px solid transparent;
+  border-radius: 6px;
+}
+
+.doc-item.is-current {
+  border-color: var(--border);
+  background: var(--panel);
+}
+
+.doc-item button {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--muted);
+  font: 12px system-ui, var(--telugu-font);
+  cursor: pointer;
+}
+
+.doc-item button:hover,
+.doc-item button:focus-visible {
+  color: var(--accent);
+}
+
+.doc-item .doc-open {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  color: var(--text);
+  text-align: left;
+}
+
+.doc-title {
+  overflow: hidden;
+  font: 15px/1.6 var(--telugu-font);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.doc-date {
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.doc-item .doc-rename {
+  grid-column: 2;
+}
+
+/* Settings */
+
+#settings {
+  width: min(360px, calc(100vw - 32px));
+  padding: 20px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--bg);
+  color: var(--text);
+}
+
+#settings::backdrop {
+  background: rgb(0 0 0 / 35%);
+}
+
+#settings h2 {
+  margin: 0 0 12px;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+#settings label {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 10px;
+  font-size: 14px;
+}
+
+#settings label.check {
+  justify-content: flex-start;
+}
+
+#settings label[hidden] {
+  display: none;
+}
+
+#settings select,
+#settings input[type='text'],
+#settings input[type='number'] {
+  width: 170px;
+  padding: 4px 8px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--bg);
+  color: var(--text);
+  font: 14px system-ui, var(--telugu-font);
+}
+
+.settings-note {
+  margin: 14px 0;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+#status-saved,
+#status-message {
+  white-space: nowrap;
 }

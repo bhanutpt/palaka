@@ -3,9 +3,13 @@ import type { EditorStatus } from '../editor/createEditor';
 import { codePointsOf } from '../editor/inspect';
 
 const COUNT_DELAY_MS = 250;
+const FLASH_MS = 2000;
 
 export interface StatusBar {
   update(status: EditorStatus, getText: () => string): void;
+  setSaved(saved: boolean): void;
+  /** Shows a short message (Copied …) that fades by itself. */
+  flash(message: string): void;
 }
 
 /** Character count in code points (line breaks excluded) and word count. */
@@ -23,9 +27,20 @@ export function createStatusBar(root: HTMLElement): StatusBar {
   const cursor = field('status-cursor');
   const counts = field('status-counts');
   const warning = field('status-warning');
+  const savedField = field('status-saved');
+  const message = field('status-message');
   let timer: number | undefined;
+  let flashTimer: number | undefined;
 
   return {
+    setSaved(saved) {
+      savedField.textContent = saved ? 'Saved' : 'Edited';
+    },
+    flash(text) {
+      message.textContent = text;
+      window.clearTimeout(flashTimer);
+      flashTimer = window.setTimeout(() => (message.textContent = ''), FLASH_MS);
+    },
     update(status, getText) {
       mode.textContent = status.mode === 'telugu' ? 'Palaka-HK' : 'English';
       echo.textContent = status.echo;

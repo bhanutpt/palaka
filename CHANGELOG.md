@@ -2,6 +2,23 @@
 
 ## Unreleased
 
+### Phase 4: documents and offline
+
+- Autosave to IndexedDB after a pause in typing, with a Saved/Edited indicator. When a tab closes, the
+  text also goes into a synchronous draft, which the next start picks up if it is newer than the
+  stored document, so text survives a tab closed straight after typing.
+- Multiple documents in a sidebar: new, switch, rename, delete (with confirmation). The title is the
+  name or the first line. Each document gets its own undo history. Empty documents are never stored.
+- Open `.txt` (UTF-8, cleaned up like pasted text) as a new document; Save as a UTF-8 `.txt`
+  download; Copy all.
+- Settings, stored in localStorage and applied at once: theme (system, light, dark), font (Noto Sans
+  Telugu, Noto Serif Telugu, or an installed font by name), font size, Telugu digits, and the key of
+  the Telugu/English switch (Ctrl+Space, Ctrl+., F9).
+- Noto Sans Telugu and Noto Serif Telugu are bundled; the page makes no request to any other site.
+- Installable offline app: web manifest, icons, and a service worker that caches the whole app.
+- Browser tests now run against the production build. 10 new Playwright tests, including a closed tab
+  and a reload with the network switched off.
+
 ### Phase 3: chart and status bar
 
 - Character chart generated from the mapping in the traditional order: vowels, vowel signs, the five

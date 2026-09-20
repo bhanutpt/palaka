@@ -198,7 +198,12 @@ function syllableHistory(): Extension {
   });
 }
 
-export function liveTyping(shortcut = 'Ctrl-Space'): Extension {
+/** Key binding of the Telugu/English switch; kept apart so that it can be reconfigured. */
+export function modeShortcut(key: string): Extension {
+  return Prec.high(keymap.of([{ key, run: toggleMode, preventDefault: true }]));
+}
+
+export function liveTyping(): Extension {
   return [
     modeField,
     liveField,
@@ -207,11 +212,6 @@ export function liveTyping(shortcut = 'Ctrl-Space'): Extension {
     EditorView.domEventHandlers({ keydown: watchCapsLock, keyup: watchCapsLock, mousedown: watchCapsLock }),
     syllableHistory(),
     EditorView.inputHandler.of(handleInput),
-    Prec.high(
-      keymap.of([
-        { key: 'Backspace', run: handleBackspace },
-        { key: shortcut, run: toggleMode, preventDefault: true },
-      ]),
-    ),
+    Prec.high(keymap.of([{ key: 'Backspace', run: handleBackspace }])),
   ];
 }

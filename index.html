@@ -3,15 +3,27 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Palaka: type roman letters in the Palaka-HK scheme and get exact Telugu Unicode. Works offline." />
+    <meta name="theme-color" content="#1f6f5c" />
+    <link rel="icon" href="icon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="icon-192.png" />
     <title>పలక! — Palaka</title>
   </head>
   <body>
     <header id="toolbar">
       <h1>పలక!</h1>
-      <button id="mode-toggle" type="button" title="Switch between Telugu and English typing (Ctrl+Space)"></button>
+      <button id="docs-toggle" type="button" aria-expanded="false" aria-controls="documents">Documents</button>
+      <button id="doc-new" type="button">New</button>
+      <button id="doc-open" type="button">Open</button>
+      <button id="doc-save" type="button" title="Save as a UTF-8 .txt file">Save</button>
+      <button id="copy-all" type="button">Copy all</button>
+      <button id="mode-toggle" type="button" title="Switch between Telugu and English typing"></button>
       <span class="toolbar-space"></span>
+      <button id="settings-open" type="button">Settings</button>
       <button id="chart-toggle" type="button" aria-expanded="true" aria-controls="chart">Chart</button>
+      <input id="file-input" type="file" accept=".txt,text/plain" hidden />
     </header>
+    <aside id="documents" aria-label="Documents" hidden></aside>
     <main id="editor"></main>
     <aside id="chart" aria-label="Character chart"></aside>
     <footer id="status" aria-live="polite">
@@ -20,8 +32,50 @@
       <span id="status-cursor" title="Syllable before the cursor: roman spelling and Unicode code points"></span>
       <span id="status-warning"></span>
       <span class="toolbar-space"></span>
+      <span id="status-message"></span>
+      <span id="status-saved" title="Your text is stored in this browser only"></span>
       <span id="status-counts"></span>
     </footer>
+
+    <dialog id="settings" aria-labelledby="settings-title">
+      <form method="dialog">
+        <h2 id="settings-title">Settings</h2>
+        <label>Theme
+          <select id="set-theme">
+            <option value="system">Same as the system</option>
+            <option value="light">Light</option>
+            <option value="dark">Dark</option>
+          </select>
+        </label>
+        <label>Font
+          <select id="set-font">
+            <option value="sans">Noto Sans Telugu</option>
+            <option value="serif">Noto Serif Telugu</option>
+            <option value="custom">A font installed on this computer</option>
+          </select>
+        </label>
+        <label id="set-custom-font-row">Font name
+          <input id="set-custom-font" type="text" autocomplete="off" spellcheck="false" placeholder="for example Ramabhadra" />
+        </label>
+        <label>Font size
+          <input id="set-font-size" type="number" min="14" max="40" step="1" />
+        </label>
+        <label class="check">
+          <input id="set-digits" type="checkbox" />
+          Type Telugu digits (0–9 become ౦–౯)
+        </label>
+        <label>Telugu/English switch
+          <select id="set-shortcut">
+            <option value="Ctrl-Space">Ctrl+Space</option>
+            <option value="Ctrl-.">Ctrl+.</option>
+            <option value="F9">F9</option>
+          </select>
+        </label>
+        <p class="settings-note">Everything is stored in this browser. Nothing is sent anywhere.</p>
+        <button id="settings-close" type="submit">Close</button>
+      </form>
+    </dialog>
+
     <script type="module" src="/src/main.ts"></script>
   </body>
 </html>

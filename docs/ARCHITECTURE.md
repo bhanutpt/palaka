@@ -21,13 +21,19 @@ src/chart/
   chartModel.ts            pure: sections and tiles from the mapping, guninta, search, tile lookup
   chartPanel.ts            DOM: tiles, guninta panel, search box, highlights
 src/app/
-  statusBar.ts             mode, echo, cursor syllable, counts, warnings
-  styles.css               (phase 4 adds documents, settings, storage)
+  storage.ts               IndexedDB document store; the key-value interface used for localStorage
+  documents.ts             DOM-free: document list, autosave, crash draft, titles
+  settings.ts              load, validate, save and apply settings; font stack
+  files.ts                 open and save .txt, copy all
+  sidebar.ts, settingsDialog.ts, statusBar.ts   small DOM components
+  styles.css               light and dark palettes as custom properties
+public/                    app icons
 src/help/                  phase 5: help page generated from the mapping
 tests/golden/              words.tsv (both directions), forward-only.tsv
 tests/engine/              golden, mapping, rule and round-trip property tests
 tests/editor/              composer and inspector tests
 tests/chart/               chart model tests
+tests/app/                 document manager (fake-indexeddb) and settings tests
 tests/e2e/                 Playwright typing and chart tests in a real browser
 scripts/                   validate-scheme.ts (build gate), gen-scheme-doc.ts
 ```
@@ -69,6 +75,18 @@ so a letter added to the mapping appears in the chart, the search and the gunint
 inserts exactly what it shows. The editor reports the key just typed and the syllable before the
 cursor through one status callback; `main.ts` passes them to the chart and the status bar, so the
 chart and the editor never import each other.
+
+## Documents and offline
+
+`DocumentManager` owns the list of documents and is free of DOM code: it talks to the editor through
+a two-method port and to storage through `DocumentStore` (IndexedDB) and a key-value store
+(localStorage in the app, a Map in tests). Autosave is debounced. IndexedDB cannot be relied on while
+a tab is closing, so `pagehide` also writes the open text to the key-value store synchronously; on the
+next start a draft newer than the stored document wins.
+
+The build is a static site. `vite-plugin-pwa` generates the manifest and a service worker that
+precaches every file, fonts included, so the app starts with no network. Nothing is ever requested
+from another origin; a browser test asserts that.
 
 ## Dependency rule
 

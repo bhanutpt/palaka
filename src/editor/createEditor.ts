@@ -10,6 +10,7 @@ import {
   liveField,
   liveTyping,
   modeField,
+  modeShortcut,
   setMode,
   toggleMode,
   unmappedField,
@@ -38,6 +39,10 @@ export interface PalakaEditor {
   setMode(mode: InputMode): void;
   toggleMode(): void;
   setOptions(options: ConvertOptions): void;
+  /** Changes the key of the Telugu/English switch (a CodeMirror key name such as Ctrl-Space). */
+  setShortcut(key: string): void;
+  /** Replaces the whole text and starts a fresh undo history; mode and settings are kept. */
+  load(text: string): void;
   /** Inserts text at the cursor, replacing the selection. */
   insert(text: string): void;
   /** Replaces `expected` with `text` if it stands right before the cursor; otherwise just inserts `text`. */
@@ -69,14 +74,17 @@ function readStatus(state: EditorState, docChanged: boolean): EditorStatus {
 
 export function createEditor(config: EditorConfig): PalakaEditor {
   const options = new Compartment();
+  const shortcut = new Compartment();
+  let currentOptions: ConvertOptions = {};
+  let currentShortcut = config.shortcut ?? 'Ctrl-Space';
 
-  const view = new EditorView({
-    parent: config.parent,
-    state: EditorState.create({
-      doc: normalise(config.doc ?? ''),
+  const createState = (doc: string) =>
+    EditorState.create({
+      doc: normalise(doc),
       extensions: [
-        liveTyping(config.shortcut),
-        options.of(convertOptions.of({})),
+        liveTyping(),
+        options.of(convertOptions.of(currentOptions)),
+        shortcut.of(modeShortcut(currentShortcut)),
         keymap.of([...defaultKeymap, ...historyKeymap]),
         drawSelection(),
         EditorView.lineWrapping,
@@ -93,8 +101,9 @@ export function createEditor(config: EditorConfig): PalakaEditor {
           if (update.transactions.length > 0) config.onStatus?.(readStatus(update.state, update.docChanged));
         }),
       ],
-    }),
-  });
+    });
+
+  const view = new EditorView({ parent: config.parent, state: createState(config.doc ?? '') });
   config.onStatus?.(readStatus(view.state, true));
 
   const insert = (text: string, from: number, to: number) =>
@@ -130,7 +139,18 @@ export function createEditor(config: EditorConfig): PalakaEditor {
       insert(text, stands ? from : main.from, main.to);
     },
     setOptions(next) {
+      currentOptions = next;
       view.dispatch({ effects: options.reconfigure(convertOptions.of(next)) });
+    },
+    setShortcut(key) {
+      currentShortcut = key;
+      view.dispatch({ effects: shortcut.reconfigure(modeShortcut(key)) });
+    },
+    load(text) {
+      const mode = view.state.field(modeField);
+      view.setState(createState(text));
+      view.dispatch({ effects: setMode.of(mode) });
+      config.onStatus?.(readStatus(view.state, true));
     },
   };
 }

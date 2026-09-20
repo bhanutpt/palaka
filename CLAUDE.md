@@ -6,8 +6,9 @@ the scheme is in [docs/SCHEME.md](docs/SCHEME.md); the structure is in [docs/ARC
 
 ## Commands
 
-- `npm test` runs the engine and composer tests (Vitest and fast-check).
-- `npm run test:e2e` runs the Playwright typing tests (installed Edge locally, Chromium in CI).
+- `npm test` runs the unit tests: engine, composer, chart model, documents, settings.
+- `npm run test:e2e` builds, then runs the Playwright tests against the production build
+  (installed Edge locally, Chromium in CI).
 - `npm run lint`, `npm run typecheck`
 - `npm run build` validates the scheme, type-checks and builds the static site.
 - `npm run check` runs all of the above; run it at the end of every phase.

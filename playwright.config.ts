@@ -12,9 +12,11 @@ export default defineConfig({
     // Locally the installed Edge is used, so no browser download is needed; CI installs Chromium.
     channel: process.env.CI ? undefined : 'msedge',
   },
+  // The tests run against the production build: the service worker only exists there.
   webServer: {
-    command: `npm run dev -- --port ${PORT} --strictPort`,
+    command: `npm run build && npm run preview -- --port ${PORT} --strictPort`,
     url: `http://localhost:${PORT}`,
     reuseExistingServer: !process.env.CI,
+    timeout: 120_000,
   },
 });
