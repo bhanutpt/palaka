@@ -1,0 +1,501 @@
+# Palaka-HK golden word list: roman <TAB> expected Telugu.
+# Every pair is tested in both directions: toTelugu(roman) = telugu and toRoman(telugu) = roman.
+# Lines starting with # and blank lines are ignored. \uXXXX escapes are allowed (used for ZWNJ).
+# Reviewed by eye by a native reader; after that this file guards every change.
+
+# --- Independent vowels
+a	అ
+A	ఆ
+i	ఇ
+I	ఈ
+u	ఉ
+U	ఊ
+R	ఋ
+RR	ౠ
+lR	ఌ
+lRR	ౡ
+e	ఎ
+E	ఏ
+ai	ఐ
+o	ఒ
+O	ఓ
+au	ఔ
+
+# --- Every consonant with the inherent vowel
+ka	క
+kha	ఖ
+ga	గ
+gha	ఘ
+Ga	ఙ
+ca	చ
+cha	ఛ
+ja	జ
+jha	ఝ
+Ja	ఞ
+Ta	ట
+Tha	ఠ
+Da	డ
+Dha	ఢ
+Na	ణ
+ta	త
+tha	థ
+da	ద
+dha	ధ
+na	న
+pa	ప
+pha	ఫ
+ba	బ
+bha	భ
+ma	మ
+ya	య
+ra	ర
+la	ల
+va	వ
+za	శ
+Sa	ష
+sa	స
+ha	హ
+La	ళ
+rxa	ఱ
+kSa	క్ష
+jJa	జ్ఞ
+
+# --- Bare consonants: visible pollu
+k	క్
+g	గ్
+c	చ్
+T	ట్
+N	ణ్
+t	త్
+n	న్
+p	ప్
+m	మ్
+y	య్
+r	ర్
+l	ల్
+v	వ్
+z	శ్
+S	ష్
+s	స్
+h	హ్
+L	ళ్
+rx	ఱ్
+kS	క్ష్
+
+# --- Guninta of ka: every vowel sign
+kA	కా
+ki	కి
+kI	కీ
+ku	కు
+kU	కూ
+kR	కృ
+kRR	కౄ
+klR	కౢ
+klRR	కౣ
+ke	కె
+kE	కే
+kai	కై
+ko	కొ
+kO	కో
+kau	కౌ
+kaM	కం
+kaH	కః
+
+# --- Vowel signs on other consonants
+gA	గా
+ci	చి
+jI	జీ
+Tu	టు
+DU	డూ
+tR	తృ
+dRR	దౄ
+ne	నె
+pE	పే
+bai	బై
+mo	మొ
+yO	యో
+rau	రౌ
+lA	లా
+vi	వి
+zI	శీ
+Su	షు
+sU	సూ
+hR	హృ
+Le	ళె
+rxE	ఱే
+khai	ఖై
+gho	ఘొ
+chO	ఛో
+jhau	ఝౌ
+ThA	ఠా
+Dhi	ఢి
+NI	ణీ
+thu	థు
+dhU	ధూ
+phe	ఫె
+bhE	భే
+GA	ఙా
+Ji	ఞి
+
+# --- Signs
+aM	అం
+aH	అః
+aMx	అఁ
+iM	ఇం
+duHkhaM	దుఃఖం
+aMtaHpuraM	అంతఃపురం
+sO'haM	సోఽహం
+
+# --- Worked examples from the plan
+palaka	పలక
+telugu	తెలుగు
+dEzaM	దేశం
+kRSNa	కృష్ణ
+jJAnaM	జ్ఞానం
+gurraM	గుర్రం
+ceTTu	చెట్టు
+
+# --- Family and home
+amma	అమ్మ
+nAnna	నాన్న
+akka	అక్క
+anna	అన్న
+tammuDu	తమ్ముడు
+celli	చెల్లి
+tAta	తాత
+ammamma	అమ్మమ్మ
+illu	ఇల్లు
+Uru	ఊరు
+nIru	నీరు
+pAlu	పాలు
+annaM	అన్నం
+kUra	కూర
+pappu	పప్పు
+neyyi	నెయ్యి
+perugu	పెరుగు
+uppu	ఉప్పు
+kAraM	కారం
+pustakaM	పుస్తకం
+kalaM	కలం
+baDi	బడి
+guDi	గుడి
+
+# --- Nature
+ceruvu	చెరువు
+nadi	నది
+koMDa	కొండ
+aDavi	అడవి
+AkAzaM	ఆకాశం
+sUryuDu	సూర్యుడు
+caMdruDu	చంద్రుడు
+nakSatraM	నక్షత్రం
+varSaM	వర్షం
+gAli	గాలి
+nippu	నిప్పు
+bhUmi	భూమి
+samudraM	సముద్రం
+puvvu	పువ్వు
+paMDu	పండు
+Aku	ఆకు
+komma	కొమ్మ
+vEru	వేరు
+
+# --- Animals and body
+Avu	ఆవు
+eddu	ఎద్దు
+kukka	కుక్క
+pilli	పిల్లి
+Enugu	ఏనుగు
+siMhaM	సింహం
+puli	పులి
+kOti	కోతి
+pAmu	పాము
+cEpa	చేప
+pakSi	పక్షి
+kAki	కాకి
+nemali	నెమలి
+ciluka	చిలుక
+gorre	గొర్రె
+oMTe	ఒంటె
+Iga	ఈగ
+eluka	ఎలుక
+kannu	కన్ను
+cevi	చెవి
+mukku	ముక్కు
+nOru	నోరు
+ceyyi	చెయ్యి
+kAlu	కాలు
+tala	తల
+
+# --- Numbers and colours
+okaTi	ఒకటి
+reMDu	రెండు
+mUDu	మూడు
+nAlugu	నాలుగు
+aidu	ఐదు
+Aru	ఆరు
+EDu	ఏడు
+enimidi	ఎనిమిది
+tommidi	తొమ్మిది
+padi	పది
+vaMda	వంద
+veyyi	వెయ్యి
+lakSa	లక్ష
+kOTi	కోటి
+erupu	ఎరుపు
+nalupu	నలుపు
+telupu	తెలుపు
+pasupu	పసుపు
+nIlaM	నీలం
+
+# --- Pronouns, question words, verbs
+nEnu	నేను
+nuvvu	నువ్వు
+mIru	మీరు
+manaM	మనం
+vALLu	వాళ్ళు
+atanu	అతను
+Ame	ఆమె
+idi	ఇది
+adi	అది
+ikkaDa	ఇక్కడ
+akkaDa	అక్కడ
+ekkaDa	ఎక్కడ
+eppuDu	ఎప్పుడు
+eMduku	ఎందుకు
+elA	ఎలా
+EmiTi	ఏమిటి
+evaru	ఎవరు
+avunu	అవును
+kAdu	కాదు
+lEdu	లేదు
+uMdi	ఉంది
+vaccADu	వచ్చాడు
+veLLiMdi	వెళ్ళింది
+cEstAnu	చేస్తాను
+cUzAnu	చూశాను
+tinnAru	తిన్నారు
+rAstunnAnu	రాస్తున్నాను
+cadivAnu	చదివాను
+pADutuMdi	పాడుతుంది
+
+# --- Greetings, language, learning
+namaskAraM	నమస్కారం
+dhanyavAdAlu	ధన్యవాదాలు
+zubhOdayaM	శుభోదయం
+svAgataM	స్వాగతం
+bhASa	భాష
+akSaraM	అక్షరం
+padaM	పదం
+vAkyaM	వాక్యం
+kavita	కవిత
+katha	కథ
+pATa	పాట
+saMgItaM	సంగీతం
+nATyaM	నాట్యం
+citraM	చిత్రం
+sinimA	సినిమా
+vidya	విద్య
+vidyArthi	విద్యార్థి
+upAdhyAyuDu	ఉపాధ్యాయుడు
+pAThazAla	పాఠశాల
+vizvavidyAlayaM	విశ్వవిద్యాలయం
+graMthAlayaM	గ్రంథాలయం
+prazna	ప్రశ్న
+javAbu	జవాబు
+parIkSa	పరీక్ష
+
+# --- Feelings and values
+prEma	ప్రేమ
+snEhaM	స్నేహం
+saMtOSaM	సంతోషం
+kOpaM	కోపం
+bhayaM	భయం
+dhairyaM	ధైర్యం
+zAMti	శాంతి
+satyaM	సత్యం
+dharmaM	ధర్మం
+nyAyaM	న్యాయం
+svEccha	స్వేచ్ఛ
+
+# --- Places and festivals
+AMdhrapradEz	ఆంధ్రప్రదేశ్
+telaMgANa	తెలంగాణ
+haidarAbAd	హైదరాబాద్
+vijayavADa	విజయవాడ
+vizAkhapaTnaM	విశాఖపట్నం
+tirupati	తిరుపతి
+bhAratadEzaM	భారతదేశం
+gOdAvari	గోదావరి
+kRSNA	కృష్ణా
+ugAdi	ఉగాది
+saMkrAMti	సంక్రాంతి
+dIpAvaLi	దీపావళి
+dasarA	దసరా
+
+# --- Less common letters in real words
+RSi	ఋషి
+Rtuvu	ఋతువు
+RNaM	ఋణం
+aizvaryaM	ఐశ్వర్యం
+auSadhaM	ఔషధం
+ODa	ఓడ
+Uyala	ఊయల
+iTuka	ఇటుక
+ulli	ఉల్లి
+airAvataM	ఐరావతం
+khaDgaM	ఖడ్గం
+ghaMTa	ఘంట
+chatraM	ఛత్రం
+jhaSaM	ఝషం
+ThIvi	ఠీవి
+DhaMkA	ఢంకా
+phalaM	ఫలం
+bhakti	భక్తి
+zakti	శక్తి
+vAGmayaM	వాఙ్మయం
+yAcJa	యాచ్ఞ
+pitRRNaM	పితౄణం
+klRptaM	కౢప్తం
+rxaMpaM	ఱంపం
+gurxrxaM	గుఱ్ఱం
+
+# --- Conjuncts
+kSatriyuDu	క్షత్రియుడు
+mitruDu	మిత్రుడు
+astraM	అస్త్రం
+vastraM	వస్త్రం
+strI	స్త్రీ
+zAstraM	శాస్త్రం
+rASTraM	రాష్ట్రం
+marri	మర్రి
+karra	కర్ర
+burra	బుర్ర
+tattvaM	తత్త్వం
+ujjvala	ఉజ్జ్వల
+kASThaM	కాష్ఠం
+utpatti	ఉత్పత్తి
+sthalaM	స్థలం
+spaSTaM	స్పష్టం
+zrI	శ్రీ
+zrImati	శ్రీమతి
+prapaMcaM	ప్రపంచం
+svataMtraM	స్వతంత్రం
+saMvatsaraM	సంవత్సరం
+ArOgyaM	ఆరోగ్యం
+udyOgaM	ఉద్యోగం
+vyavasAyaM	వ్యవసాయం
+dvAraM	ద్వారం
+jvaraM	జ్వరం
+khyAti	ఖ్యాతి
+mukhyaM	ముఖ్యం
+lakSyaM	లక్ష్యం
+kAvyaM	కావ్యం
+ziSyuDu	శిష్యుడు
+manuSyuDu	మనుష్యుడు
+cihnaM	చిహ్నం
+AhlAdaM	ఆహ్లాదం
+brAhmaNuDu	బ్రాహ్మణుడు
+brahma	బ్రహ్మ
+viSNuvu	విష్ణువు
+lakSmi	లక్ష్మి
+yuddhaM	యుద్ధం
+buddhi	బుద్ధి
+siddhAMtaM	సిద్ధాంతం
+vijJAnaM	విజ్ఞానం
+kRtajJata	కృతజ్ఞత
+kArtIkaM	కార్తీకం
+mArgaM	మార్గం
+svargaM	స్వర్గం
+sUryOdayaM	సూర్యోదయం
+kAryakramaM	కార్యక్రమం
+aMtarjAlaM	అంతర్జాలం
+saMskRtaM	సంస్కృతం
+saMskRti	సంస్కృతి
+prakRti	ప్రకృతి
+amRtaM	అమృతం
+gRhaM	గృహం
+hRdayaM	హృదయం
+dRSTi	దృష్టి
+sRSTi	సృష్టి
+peLLi	పెళ్ళి
+kaLLu	కళ్ళు
+nILLu	నీళ్ళు
+zivuDu	శివుడు
+rAmuDu	రాముడు
+sIta	సీత
+hanumaMtuDu	హనుమంతుడు
+
+# --- Word-final pollu: loan words
+bas	బస్
+kAr	కార్
+phOn	ఫోన్
+rail	రైల్
+kaMpyUTar	కంప్యూటర్
+TikeT	టికెట్
+DAkTar	డాక్టర్
+skUl	స్కూల్
+kAlEj	కాలేజ్
+AphIs	ఆఫీస్
+byAMk	బ్యాంక్
+rODDu	రోడ్డు
+pOlIs	పోలీస్
+iMTarneT	ఇంటర్నెట్
+mobail	మొబైల్
+yUTyUb	యూట్యూబ్
+
+# --- ZWNJ: the pollu stays visible instead of forming a conjunct
+sAphT^vEr	సాఫ్ట్\u200Cవేర్
+hArD^vEr	హార్డ్\u200Cవేర్
+phEs^buk	ఫేస్\u200Cబుక్
+AphIs^lO	ఆఫీస్\u200Cలో
+bas^lO	బస్\u200Cలో
+rAm^kumAr	రామ్\u200Cకుమార్
+krikeT^mAc	క్రికెట్\u200Cమాచ్
+k^	క్\u200C
+ka^	క\u200C
+
+# --- Break key: splits keys that would otherwise merge
+a_i	అఇ
+a_u	అఉ
+ka_i	కఇ
+ka_u	కఉ
+k_ha	క్హ
+T_ha	ట్హ
+g_ha	గ్హ
+l_R	లృ
+l_RR	లౄ
+kl_R	క్లృ
+R_R	ఋఋ
+|_|	।।
+|_||	।॥
+k__a	క్అ
+k__i	క్ఇ
+
+# --- Rare letters
+cxa	ౘ
+jxa	ౙ
+Lxa	ఴ
+nx	ౝ
+tamiLx	తమిఴ్
+cxApa	ౘాప
+
+# --- Punctuation, digits, danda
+rAmuDu, sIta.	రాముడు, సీత.
+EmiTi?	ఏమిటి?
+avunu!	అవును!
+2026 lO	2026 లో
+10 rUpAyalu	10 రూపాయలు
+dharmaM|	ధర్మం।
+zubhaM||	శుభం॥
+nEnu telugu rAstunnAnu.	నేను తెలుగు రాస్తున్నాను.
+
+# --- Mixed English: backtick literals
+`Hello world`	Hello world
+nEnu `Google` lO vetikAnu	నేను Google లో వెతికాను
+`A4` kAgitaM	A4 కాగితం
+`Wi-Fi` uMdi	Wi-Fi ఉంది
+`it's`	it's
+`user@example.com` ki paMpaMDi	user@example.com కి పంపండి
+``	`
+`a````b`	a`b

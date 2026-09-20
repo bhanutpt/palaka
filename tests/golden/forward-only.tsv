@@ -1,0 +1,31 @@
+# Forward-only pairs: valid input that is not the canonical spelling, so only
+# toTelugu(roman) = telugu is tested. Same format as words.tsv. (empty) in the
+# second column means the input produces no output.
+
+# --- Unneeded break keys change nothing
+k_	క్
+_ka	క
+k_a	క
+kh_a	ఖ
+pa_la_ka	పలక
+a_	అ
+_	(empty)
+
+# --- Syllable close where the pollu would appear anyway
+k__	క్
+a__	అ
+__	(empty)
+k__ka	క్క
+
+# --- Literal spans
+`ab``cd`	abcd
+`abc	abc
+k`x`	క్x
+ka`-`ki	క-కి
+
+# --- Unmapped letters pass through unchanged
+f	f
+q	q
+w	w
+xa	xఅ
+kaf	కf
