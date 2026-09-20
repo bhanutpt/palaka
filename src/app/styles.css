@@ -1,0 +1,104 @@
+:root {
+  --bg: #fbfaf7;
+  --panel: #f0eee8;
+  --text: #1d1b16;
+  --muted: #6b675d;
+  --accent: #1f6f5c;
+  --warning: #a4380b;
+  --border: #d9d5ca;
+  --telugu-font: 'Noto Sans Telugu', 'Nirmala UI', 'Gautami', sans-serif;
+  --editor-size: 20px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  background: var(--bg);
+  color: var(--text);
+  font-family: system-ui, var(--telugu-font);
+}
+
+#toolbar {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 6px 16px;
+  background: var(--panel);
+  border-bottom: 1px solid var(--border);
+}
+
+#toolbar h1 {
+  margin: 0;
+  font: 600 20px var(--telugu-font);
+  color: var(--accent);
+}
+
+#mode-toggle {
+  min-width: 88px;
+  padding: 4px 12px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--bg);
+  color: var(--text);
+  font: 15px var(--telugu-font);
+  cursor: pointer;
+}
+
+#mode-toggle:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+
+#editor {
+  min-height: 0;
+  overflow: hidden;
+}
+
+#editor .cm-editor {
+  height: 100%;
+  outline: none;
+}
+
+#editor .cm-scroller {
+  overflow: auto;
+  font-family: var(--telugu-font);
+  font-size: var(--editor-size);
+  /* Generous, so that vowel signs and stacked conjuncts are never clipped. */
+  line-height: 2;
+}
+
+#editor .cm-content {
+  max-width: 48em;
+  margin: 0 auto;
+  padding: 24px 16px 40vh;
+}
+
+#status {
+  display: flex;
+  gap: 24px;
+  min-height: 28px;
+  padding: 4px 16px;
+  background: var(--panel);
+  border-top: 1px solid var(--border);
+  color: var(--muted);
+  font-size: 13px;
+}
+
+#status-echo {
+  font-family: ui-monospace, Consolas, monospace;
+  color: var(--text);
+}
+
+#status-warning {
+  color: var(--warning);
+}

@@ -63,6 +63,13 @@ export function validateScheme(data: SchemeData): string[] {
     if (entry.type === 'vowel' && entry.sign) claim(entry.sign, entry);
   }
 
+  // Live typing renders every keystroke, so each key must be reachable through keys:
+  // lRR through lR through l. A key whose prefix is not a key could never be typed.
+  for (const key of keys.keys()) {
+    const prefix = key.slice(0, -1);
+    if (prefix && !keys.has(prefix)) errors.push(`entry "${key}": its prefix "${prefix}" is not a key`);
+  }
+
   const count = (test: (e: SchemeEntry) => boolean) => data.entries.filter(test).length;
   if (count((e) => e.type === 'vowel' && e.sign === '') !== 1) errors.push('exactly one vowel must be inherent (empty sign)');
   for (const action of ['zwnj', 'break', 'close']) {

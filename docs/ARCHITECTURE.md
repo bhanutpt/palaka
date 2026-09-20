@@ -12,12 +12,17 @@ src/engine/                pure functions, no DOM
   toRoman.ts               canonical reverse conversion with break-key insertion
   normalise.ts             NFC, BOM and line-ending clean-up for pasted and opened text
   validate.ts              build-time validation of the mapping
-src/editor/                phase 2: CodeMirror setup, live-typing handler, inspector
+src/editor/
+  composer.ts              pure: the syllable in progress, typeChar(), backspace()
+  liveTyping.ts            CodeMirror extension: input handler, backspace, mode, syllable undo
+  createEditor.ts          editor set-up, paste clean-up, status callback
 src/chart/                 phase 3: chart panel, guninta pop-up, search
 src/app/                   phase 4: shell, toolbar, status bar, settings, storage
 src/help/                  phase 5: help page generated from the mapping
 tests/golden/              words.tsv (both directions), forward-only.tsv
 tests/engine/              golden, mapping, rule and round-trip property tests
+tests/editor/              composer tests
+tests/e2e/                 Playwright typing tests in a real browser
 scripts/                   validate-scheme.ts (build gate), gen-scheme-doc.ts
 ```
 
@@ -36,6 +41,20 @@ the real tokenizer, a new key in the mapping can never introduce an unnoticed me
 Text the scheme cannot express in its position (an orphan vowel sign, ZWJ, an unassigned code point)
 is copied as is in both directions, which is what makes the round trip hold for *any* NFC text, not
 only for well-formed Telugu. Characters that `toTelugu` would read as keys are wrapped in backticks.
+
+## Live typing
+
+The document holds Telugu only. `composer.ts` keeps the roman keys of the syllable in progress and
+re-renders that syllable through the engine on every keystroke. The buffer holds exactly what a later
+key could still change; it is cut when a consonant arrives while no earlier consonant is waiting for
+its vowel, and it ends on anything outside the map. A property test proves that typing keystroke by
+keystroke always gives the same text as converting the whole input at once.
+
+`liveTyping.ts` stores the live syllable and its document position in a state field. Any transaction
+that is not its own (cursor move, click, paste, undo, Enter) clears the field, which is what ends the
+buffer. Its edits carry an annotation that the undo history uses to group by syllable instead of by
+time. When a live pollu joins the following letter into one conjunct, the browser reports the next
+keystroke beyond that cluster; the position in the editor state wins.
 
 ## Dependency rule
 

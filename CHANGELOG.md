@@ -2,6 +2,22 @@
 
 ## Unreleased
 
+### Phase 2: editor
+
+- CodeMirror 6 editor with live Palaka-HK typing: the syllable in progress is re-rendered on every
+  keystroke (`k` క్, `kh` ఖ్, `khA` ఖా) and the status line echoes its roman keys.
+- The buffer is cut when a new syllable starts and ends on a space, punctuation, an unmapped letter, a
+  closing backtick, a cursor move, a click, Enter, a paste, undo or the mode switch.
+- Backspace removes one roman keystroke while the syllable is live and one code point afterwards.
+- Undo and redo work by whole syllable.
+- Telugu/English mode switch (Ctrl+Space or the toolbar button); backtick literals while typing.
+- Paste clean-up: NFC, BOM removal, line endings. Text from an IME or a system Telugu keyboard is
+  left untouched. The field disables autocapitalize, autocorrect and spellcheck.
+- Mapping validation now also requires every key to be typeable keystroke by keystroke
+  (each proper prefix of a key is a key).
+- Tests: composer unit and property tests (typing keystroke by keystroke equals converting the whole
+  text), 16 Playwright typing tests. Playwright uses the installed Edge locally and Chromium in CI.
+
 ### Phase 1: scheme and engine
 
 - `scheme/palaka-hk.json` version 1.0.0: vowels, consonants, signs, controls, rare letters, digits.

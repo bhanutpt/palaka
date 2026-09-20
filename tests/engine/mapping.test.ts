@@ -68,6 +68,11 @@ describe('validateScheme catches broken mappings', () => {
     expect(validateScheme(bad).join('\n')).toMatch(/"x" may only be the final character/);
   });
 
+  it('key that cannot be typed keystroke by keystroke', () => {
+    const bad = withEntries((e) => e.push({ ...e.find((x) => x.key === 'rx')!, key: 'qx', letter: 'ౚ', order: 99 }));
+    expect(validateScheme(bad).join('\n')).toMatch(/its prefix "q" is not a key/);
+  });
+
   it('group missing from the chart', () => {
     const bad = withEntries((e) => {
       (e[0] as { group: string }).group = 'nowhere';

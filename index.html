@@ -6,7 +6,16 @@
     <title>పలక! — Palaka</title>
   </head>
   <body>
-    <div id="app"></div>
+    <header id="toolbar">
+      <h1>పలక!</h1>
+      <button id="mode-toggle" type="button" title="Switch between Telugu and English typing (Ctrl+Space)"></button>
+    </header>
+    <main id="editor"></main>
+    <footer id="status" aria-live="polite">
+      <span id="status-mode"></span>
+      <span id="status-echo" title="Roman keys of the syllable being typed"></span>
+      <span id="status-warning"></span>
+    </footer>
     <script type="module" src="/src/main.ts"></script>
   </body>
 </html>

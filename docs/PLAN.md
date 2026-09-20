@@ -348,6 +348,6 @@ Each item has a proposed default already written into the plan; change any of th
 - [x] **Key for arasunna ఁ.** Proposed: `Mx`. An alternative is `~`.
 - [x] **Convenience aliases.** Proposed: none in version 1. Candidates for later are `f` for ఫ and `w` for వ; aliases affect typing only, since reverse conversion always gives the canonical key.
 - [x] **Digits.** Proposed: 0–9 stay as they are, with a setting for ౦–౯.
-- [ ] **Mode-switch shortcut.** Proposed: Ctrl+Space, configurable, because some systems reserve that combination.
-- [ ] **Editor component.** Proposed: CodeMirror 6. A plain textarea is simpler but makes syllable-level undo, the inspector and large documents much harder.
+- [x] **Mode-switch shortcut.** Proposed: Ctrl+Space, configurable, because some systems reserve that combination.
+- [x] **Editor component.** Proposed: CodeMirror 6. A plain textarea is simpler but makes syllable-level undo, the inspector and large documents much harder.
 - [x] **Hosting and licence.** Proposed: GitHub Pages and an open-source licence such as MIT, so others can adopt the scheme.
