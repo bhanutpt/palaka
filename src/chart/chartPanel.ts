@@ -9,6 +9,8 @@ export interface ChartPanelConfig {
   onReplace(expected: string, text: string): void;
   /** Called after a pointer click, so that the editor can take the focus back. */
   onDone(): void;
+  /** Escape was pressed in the chart with nothing left to close: the writer wants to go back to the text. */
+  onLeave(): void;
 }
 
 export interface ChartPanel {
@@ -18,6 +20,8 @@ export interface ChartPanel {
   setCursorText(text: string): void;
   /** Call on every editor update: a guninta choice only replaces the letter the chart itself just inserted. */
   editorChanged(): void;
+  /** Puts the keyboard focus into the chart, on its search box. */
+  focus(): void;
 }
 
 function el<K extends keyof HTMLElementTagNameMap>(tag: K, className = '', text = ''): HTMLElementTagNameMap[K] {
@@ -33,6 +37,8 @@ export function createChartPanel(config: ChartPanelConfig): ChartPanel {
   const tiles = new Map<string, Tile>();
   /** Text the chart has just inserted and that still stands before the cursor. */
   let justInserted: string | null = null;
+  /** The tile whose guninta is open. */
+  let gunintaTile: string | null = null;
 
   const search = el('input', 'chart-search');
   search.type = 'search';
@@ -55,17 +61,27 @@ export function createChartPanel(config: ChartPanelConfig): ChartPanel {
     const button = el('button', className);
     button.type = 'button';
     button.setAttribute('aria-label', label);
-    button.append(el('span', 'tile-letter', display), el('span', 'tile-key', key));
+    const letter = el('span', 'tile-letter', display);
+    letter.lang = 'te';
+    button.append(letter, el('span', 'tile-key', key));
     // Keep the editor's selection and focus while clicking with the mouse.
     button.addEventListener('mousedown', (event) => event.preventDefault());
     return button;
   }
 
+  /** Closes the guninta; a keyboard user is put back on the tile that opened it. */
+  function closeGuninta(opener: HTMLElement | undefined) {
+    const hadFocus = guninta.contains(document.activeElement);
+    guninta.hidden = true;
+    if (hadFocus) opener?.focus();
+  }
+
   function showGuninta(tile: Tile) {
+    gunintaTile = tile.id;
     const close = el('button', 'guninta-close', '×');
     close.type = 'button';
     close.setAttribute('aria-label', 'Close the guninta');
-    close.addEventListener('click', () => (guninta.hidden = true));
+    close.addEventListener('click', () => closeGuninta(buttons.get(tile.id)));
 
     const cells = el('div', 'chart-grid');
     for (const cell of gunintaOf(tile, schemeData)) {
@@ -81,7 +97,9 @@ export function createChartPanel(config: ChartPanelConfig): ChartPanel {
     }
 
     const head = el('div', 'guninta-head');
-    head.append(el('span', '', `${tile.display} గుణింతం`), close);
+    const name = el('span', '', `${tile.display} గుణింతం`);
+    name.lang = 'te';
+    head.append(name, close);
     guninta.replaceChildren(head, cells);
     guninta.hidden = false;
   }
@@ -90,7 +108,11 @@ export function createChartPanel(config: ChartPanelConfig): ChartPanel {
     const block = el('section', 'chart-section');
     block.dataset.section = section.id;
     const title = el('h2', 'chart-title');
-    if (section.titleTelugu) title.append(el('span', 'chart-title-te', section.titleTelugu), ' ');
+    if (section.titleTelugu) {
+      const telugu = el('span', 'chart-title-te', section.titleTelugu);
+      telugu.lang = 'te';
+      title.append(telugu, ' ');
+    }
     title.append(section.title);
     block.append(title);
 
@@ -125,6 +147,16 @@ export function createChartPanel(config: ChartPanelConfig): ChartPanel {
     }
   });
 
+  // Escape closes the guninta first, then leaves the chart. In the search box it first clears the query.
+  config.parent.addEventListener('keydown', (event) => {
+    if (event.key !== 'Escape' || (event.target === search && search.value !== '')) return;
+    event.preventDefault();
+    if (!guninta.hidden) {
+      guninta.hidden = true;
+      if (gunintaTile) buttons.get(gunintaTile)?.focus();
+    } else config.onLeave();
+  });
+
   config.parent.append(search, body, guninta);
 
   const mark = (className: string, ids: string[]) => {
@@ -140,5 +172,6 @@ export function createChartPanel(config: ChartPanelConfig): ChartPanel {
     },
     setCursorText: (text) => mark('is-cursor', tileIdsForText(text, schemeData)),
     editorChanged: () => (justInserted = null),
+    focus: () => search.focus(),
   };
 }

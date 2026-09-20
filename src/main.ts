@@ -11,6 +11,7 @@ import { createSettingsDialog } from './app/settingsDialog';
 import { createSidebar } from './app/sidebar';
 import { createStatusBar } from './app/statusBar';
 import { DocumentStore } from './app/storage';
+import { rovingToolbar } from './app/toolbar';
 import { createChartPanel } from './chart/chartPanel';
 import { createEditor, type PalakaEditor } from './editor/createEditor';
 import { createRomanPane } from './editor/romanPane';
@@ -26,11 +27,19 @@ const statusBar = createStatusBar(byId('status'));
 const modeToggle = byId('mode-toggle');
 
 // The chart is created first; its callbacks only run on a click, when the editor exists.
+// On a narrow screen the chart is a drawer that slides up from the bottom; it starts closed.
+const narrow = window.matchMedia('(max-width: 800px)');
+if (narrow.matches) document.body.classList.add('chart-hidden');
+
 const chart = createChartPanel({
-  parent: byId('chart'),
+  parent: byId('chart-panel'),
   onInsert: (text) => editor.insert(text),
   onReplace: (expected, text) => editor.replaceBefore(expected, text),
-  onDone: () => editor.view.focus(),
+  // In the drawer the tiles are the keyboard: taking the focus would bring the on-screen keyboard up over them.
+  onDone: () => {
+    if (!narrow.matches) editor.view.focus();
+  },
+  onLeave: () => editor.view.focus(),
 });
 
 // True while text is being put into the editor by the app itself, which is not an edit to save.
@@ -41,7 +50,7 @@ const editor: PalakaEditor = createEditor({
   onStatus(status) {
     const telugu = status.mode === 'telugu';
     modeToggle.textContent = telugu ? 'తెలుగు' : 'English';
-    modeToggle.setAttribute('aria-pressed', String(telugu));
+    modeToggle.setAttribute('aria-label', telugu ? 'తెలుగు: typing Telugu' : 'English: typing English');
 
     chart.editorChanged();
     chart.setTyped(status.typedKey ? (status.typedKey.asSign ? 'sign:' : '') + status.typedKey.key : null);
@@ -113,17 +122,40 @@ document.addEventListener('visibilitychange', () => {
 
 // Toolbar
 
-const toggle = (button: HTMLElement, className: string, expandedWhenSet: boolean) => {
-  const set = document.body.classList.toggle(className);
-  button.setAttribute('aria-expanded', String(set === expandedWhenSet));
-  editor.view.focus();
+rovingToolbar(byId('tools'));
+
+/** Shows or hides the chart: the side panel on a wide screen, the drawer on a narrow one. */
+const setChart = (open: boolean) => {
+  document.body.classList.toggle('chart-hidden', !open);
+  // The slide is only animated once the writer has asked for it, not while the page loads.
+  document.body.classList.add('chart-moved');
+  for (const id of ['chart-toggle', 'chart-handle']) byId(id).setAttribute('aria-expanded', String(open));
 };
+const chartOpen = () => !document.body.classList.contains('chart-hidden');
+for (const id of ['chart-toggle', 'chart-handle']) byId(id).setAttribute('aria-expanded', String(chartOpen()));
 
 modeToggle.addEventListener('click', () => editor.toggleMode());
-byId('chart-toggle').addEventListener('click', (event) => toggle(event.currentTarget as HTMLElement, 'chart-hidden', false));
+byId('chart-toggle').addEventListener('click', () => {
+  setChart(!chartOpen());
+  editor.view.focus();
+});
+byId('chart-handle').addEventListener('click', () => setChart(!chartOpen()));
 byId('docs-toggle').addEventListener('click', (event) => {
-  toggle(event.currentTarget as HTMLElement, 'documents-open', true);
-  byId('documents').hidden = !document.body.classList.contains('documents-open');
+  const open = document.body.classList.toggle('documents-open');
+  (event.currentTarget as HTMLElement).setAttribute('aria-expanded', String(open));
+  byId('documents').hidden = !open;
+  editor.view.focus();
+});
+
+// F6 moves between the text and the chart, opening the chart if need be.
+window.addEventListener('keydown', (event) => {
+  if (event.key !== 'F6' || document.querySelector('dialog[open]')) return;
+  event.preventDefault();
+  if (byId('chart').contains(document.activeElement)) editor.view.focus();
+  else {
+    setChart(true);
+    chart.focus();
+  }
 });
 
 const press = (button: HTMLElement, on: boolean) => button.setAttribute('aria-pressed', String(on));

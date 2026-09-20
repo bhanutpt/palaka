@@ -28,6 +28,8 @@ export function buildHelp(data: SchemeData, shortcut = 'Ctrl+Space'): HelpConten
       { keys: 'Backspace', action: 'removes one roman key while a syllable is being typed, and one code point afterwards' },
       { keys: 'Ctrl+Z', action: 'undo, one syllable at a time' },
       { keys: 'Ctrl+F', action: 'find and replace; type the search in Telugu or in roman' },
+      { keys: 'F6', action: 'move between the text and the chart; Escape in the chart goes back to the text' },
+      { keys: 'Arrow keys', action: 'walk the toolbar buttons; Tab moves on to the next part of the screen' },
       { keys: 'F1', action: 'this help' },
     ],
   };

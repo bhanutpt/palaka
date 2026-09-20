@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="te">
+<html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -11,22 +11,24 @@
   </head>
   <body>
     <header id="toolbar">
-      <h1>పలక!</h1>
-      <button id="docs-toggle" type="button" aria-expanded="false" aria-controls="documents">Documents</button>
-      <button id="doc-new" type="button">New</button>
-      <button id="doc-open" type="button">Open</button>
-      <button id="doc-save" type="button" title="Save as a UTF-8 .txt file">Save</button>
-      <button id="copy-all" type="button">Copy all</button>
-      <button id="copy-roman" type="button" title="Copy the roman spelling of the selection, or of the whole text">Copy roman</button>
-      <button id="mode-toggle" type="button" title="Switch between Telugu and English typing"></button>
-      <button id="find-open" type="button" title="Find and replace (Ctrl+F)">Find</button>
-      <button id="convert-open" type="button" title="Convert a block of Palaka-HK text at once">Convert</button>
-      <button id="split-toggle" type="button" aria-pressed="false" title="Show the editable roman source below the text">Roman</button>
-      <button id="inspect-toggle" type="button" aria-pressed="false" title="Show hidden characters, stray signs and look-alike letters">Inspect</button>
-      <span class="toolbar-space"></span>
-      <button id="settings-open" type="button">Settings</button>
-      <button id="help-open" type="button" title="Help (F1)">Help</button>
-      <button id="chart-toggle" type="button" aria-expanded="true" aria-controls="chart">Chart</button>
+      <h1 lang="te">పలక!</h1>
+      <div id="tools" role="toolbar" aria-label="Tools">
+        <button id="docs-toggle" type="button" aria-expanded="false" aria-controls="documents">Documents</button>
+        <button id="doc-new" type="button">New</button>
+        <button id="doc-open" type="button">Open</button>
+        <button id="doc-save" type="button" title="Save as a UTF-8 .txt file">Save</button>
+        <button id="copy-all" type="button">Copy all</button>
+        <button id="copy-roman" type="button" title="Copy the roman spelling of the selection, or of the whole text">Copy roman</button>
+        <button id="mode-toggle" type="button" title="Switch between Telugu and English typing"></button>
+        <button id="find-open" type="button" title="Find and replace (Ctrl+F)">Find</button>
+        <button id="convert-open" type="button" title="Convert a block of Palaka-HK text at once">Convert</button>
+        <button id="split-toggle" type="button" aria-pressed="false" title="Show the editable roman source below the text">Roman</button>
+        <button id="inspect-toggle" type="button" aria-pressed="false" title="Show hidden characters, stray signs and look-alike letters">Inspect</button>
+        <span class="toolbar-space"></span>
+        <button id="settings-open" type="button">Settings</button>
+        <button id="help-open" type="button" title="Help (F1)">Help</button>
+        <button id="chart-toggle" type="button" aria-expanded="true" aria-controls="chart">Chart</button>
+      </div>
       <input id="file-input" type="file" accept=".txt,text/plain" hidden />
     </header>
     <aside id="documents" aria-label="Documents" hidden></aside>
@@ -46,14 +48,19 @@
       <main id="editor"></main>
       <section id="roman" aria-label="Roman source" hidden></section>
     </div>
-    <aside id="chart" aria-label="Character chart"></aside>
-    <footer id="status" aria-live="polite">
+    <aside id="chart" aria-label="Character chart">
+      <div id="chart-drawer">
+        <button id="chart-handle" type="button" aria-expanded="true" aria-controls="chart-panel"><span lang="te">అక్షరాలు</span> Chart</button>
+        <div id="chart-panel"></div>
+      </div>
+    </aside>
+    <footer id="status">
       <span id="status-mode"></span>
       <span id="status-echo" title="Roman keys of the syllable being typed"></span>
       <span id="status-cursor" title="Syllable before the cursor: roman spelling and Unicode code points"></span>
-      <span id="status-warning"></span>
+      <span id="status-warning" role="status"></span>
       <span class="toolbar-space"></span>
-      <span id="status-message"></span>
+      <span id="status-message" role="status"></span>
       <span id="status-saved" title="Your text is stored in this browser only"></span>
       <span id="status-counts"></span>
     </footer>
@@ -112,7 +119,7 @@
 
     <dialog id="help" aria-label="Help">
       <form method="dialog">
-        <div id="help-body"></div>
+        <div id="help-body" tabindex="0"></div>
         <div class="dialog-actions"><button id="help-close" type="submit">Close</button></div>
       </form>
     </dialog>

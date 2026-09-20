@@ -2,6 +2,25 @@
 
 ## Unreleased
 
+### Phase 6: polish and release
+
+- Accessibility pass. The toolbar is one Tab stop with arrow keys inside; F6 moves between the text
+  and the chart; Escape in the chart closes the guninta, then goes back to the text. One focus ring
+  for every control. The page language is English with `lang="te"` on all Telugu, the mode switch has
+  a spoken name, and the status bar only announces warnings and messages, not every keystroke.
+  axe finds no WCAG 2.1 A or AA violation in either theme, on a desktop or on a phone-sized screen,
+  and a unit test holds both palettes to AA contrast.
+- Phone layout: below 800 px the chart is a drawer that slides up from the bottom, closed at the
+  start, with finger-sized tiles. The text always ends where the drawer begins, and tapping a tile
+  leaves the on-screen keyboard down, so the chart is the keyboard. Reduced-motion is respected.
+- Performance: a 100,000-character document types at one frame per key, also with the roman pane,
+  the inspector and find switched on; a browser test guards the budget.
+- README, with examples that a test checks against the engine. docs/SCHEME.md is now also guarded by
+  a test that fails when it is out of date.
+- Deployment: `.github/workflows/deploy.yml` runs the full check on every push to main and publishes
+  the build to GitHub Pages. MIT licence file.
+- Tests: contrast, README and scheme-document unit tests; 18 new Playwright tests.
+
 ### Phase 5: verification tools
 
 - Split view: an editable roman pane under the text. The two stay in step line by line, in both

@@ -30,6 +30,7 @@ src/app/
   settings.ts              load, validate, save and apply settings; font stack
   files.ts                 open and save .txt, copy all
   sidebar.ts, settingsDialog.ts, statusBar.ts   small DOM components
+  toolbar.ts               keyboard behaviour of the toolbar: one Tab stop, arrow keys inside
   styles.css               light and dark palettes as custom properties
 public/                    app icons
 src/help/
@@ -41,8 +42,10 @@ tests/engine/              golden, mapping, rule and round-trip property tests
 tests/editor/              composer and inspector tests
 tests/chart/               chart model tests
 tests/app/                 document manager (fake-indexeddb) and settings tests
-tests/e2e/                 Playwright typing and chart tests in a real browser
-scripts/                   validate-scheme.ts (build gate), gen-scheme-doc.ts
+tests/e2e/                 Playwright tests in a real browser: typing, chart, documents, tools, and
+                           polish (axe accessibility scans, the phone drawer, a 100,000-character text)
+scripts/                   validate-scheme.ts (build gate), scheme-doc.ts and gen-scheme-doc.ts
+.github/workflows/         ci.yml (branches and pull requests), deploy.yml (main: check, then GitHub Pages)
 ```
 
 ## Engine
@@ -104,6 +107,30 @@ next start a draft newer than the stored document wins.
 The build is a static site. `vite-plugin-pwa` generates the manifest and a service worker that
 precaches every file, fonts included, so the app starts with no network. Nothing is ever requested
 from another origin; a browser test asserts that.
+
+## Accessibility and the phone layout
+
+The page language is English and every piece of Telugu carries `lang="te"`, so a screen reader picks
+the right voice. The toolbar is one Tab stop with arrow keys inside (`toolbar.ts`); F6 moves between
+the text and the chart and Escape in the chart goes back to the text. Only the warning and the
+message of the status bar are live regions: the roman echo changes on every keystroke and must not
+be read out. The two palettes are checked for WCAG AA contrast by a unit test that reads
+`styles.css`, and axe scans the built page in both themes and at phone size.
+
+Below 800 px the chart is a drawer. `#chart` is a grid cell as high as the visible part (the handle,
+or the open drawer), so the editor always ends where the drawer begins. The drawer inside keeps its
+full height and is clipped by the cell; the slide animates the height of the cell from its bottom
+edge. Nothing ever overflows the page, which matters because a browser scrolls even an
+`overflow: hidden` page to follow the cursor. In the drawer a tap on a tile does not move the focus
+to the editor, so the on-screen keyboard stays down and the chart is the keyboard.
+
+## Performance
+
+Everything that runs on a keystroke works on the syllable, the line or the visible range: the
+composer re-renders one syllable, the split view converts the lines an edit touched, the inspector
+decorates what is on screen. Work over the whole text (counts, autosave) waits for a pause. A browser
+test types into a 100,000-character document with every tool switched on and fails above a budget
+per key.
 
 ## Dependency rule
 

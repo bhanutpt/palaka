@@ -1,7 +1,9 @@
 name: CI
 
+# Pushes to main are checked by deploy.yml, which runs the same steps before it publishes.
 on:
   push:
+    branches-ignore: [main]
   pull_request:
 
 jobs:
