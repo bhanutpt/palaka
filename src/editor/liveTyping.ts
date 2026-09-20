@@ -55,6 +55,23 @@ export const liveField = StateField.define<LiveSyllable | null>({
   },
 });
 
+export const setCapsLock = StateEffect.define<boolean>();
+
+export const capsLockField = StateField.define<boolean>({
+  create: () => false,
+  update(on, tr) {
+    for (const effect of tr.effects) if (effect.is(setCapsLock)) return effect.value;
+    return on;
+  },
+});
+
+/** The scheme is case-sensitive, so a stuck Caps Lock silently changes every letter: watch it. */
+function watchCapsLock(event: KeyboardEvent | MouseEvent, view: EditorView): boolean {
+  const on = event.getModifierState('CapsLock');
+  if (on !== view.state.field(capsLockField)) view.dispatch({ effects: setCapsLock.of(on) });
+  return false;
+}
+
 /** Unmapped letters of the latest keystroke; cleared by the next edit. */
 export const unmappedField = StateField.define<string[]>({
   create: () => [],
@@ -186,6 +203,8 @@ export function liveTyping(shortcut = 'Ctrl-Space'): Extension {
     modeField,
     liveField,
     unmappedField,
+    capsLockField,
+    EditorView.domEventHandlers({ keydown: watchCapsLock, keyup: watchCapsLock, mousedown: watchCapsLock }),
     syllableHistory(),
     EditorView.inputHandler.of(handleInput),
     Prec.high(

@@ -1,12 +1,7 @@
 import { expect, test, type Page } from '@playwright/test';
+import { editor, text } from './helpers';
 
 const ZWNJ = String.fromCharCode(0x200c);
-
-const editor = (page: Page) => page.locator('.cm-content');
-
-async function text(page: Page): Promise<string> {
-  return (await page.locator('.cm-line').allInnerTexts()).map((line) => line.replace(/\n$/, '')).join('\n');
-}
 
 async function paste(page: Page, data: string) {
   await editor(page).evaluate((el, value) => {

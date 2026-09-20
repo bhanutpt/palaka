@@ -2,6 +2,22 @@
 
 ## Unreleased
 
+### Phase 3: chart and status bar
+
+- Character chart generated from the mapping in the traditional order: vowels, vowel signs, the five
+  vargas as a 5 by 5 grid, other consonants, signs and controls, rare letters, digits. Every key
+  appears exactly once; vowel-sign tiles are derived from the vowels.
+- A tile inserts exactly what it shows. The two keys that output nothing (`_`, `__`) are shown but inert.
+- The tile of the key just typed lights up and is scrolled into view (`kh` lights ఖ, `A` after a
+  consonant lights the sign ా). The cursor outlines the tiles of the syllable before it.
+- Guninta panel for every consonant: pollu, all vowel forms and signs, each with its canonical roman
+  spelling (లృ is `l_R`). A choice replaces the letter the chart has just inserted.
+- Search by roman key, Telugu letter or note; tiles that do not match are dimmed, so the layout stays put.
+- Status bar: mode, live roman echo, the syllable before the cursor with its roman spelling and code
+  points, character and word counts, Caps Lock and unmapped-key warnings.
+- The chart collapses from the toolbar and moves under the editor on narrow screens.
+- Tests: chart model and syllable inspector unit tests, 14 Playwright chart tests (every tile is clicked).
+
 ### Phase 2: editor
 
 - CodeMirror 6 editor with live Palaka-HK typing: the syllable in progress is re-rendered on every

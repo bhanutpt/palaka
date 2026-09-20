@@ -1,8 +1,11 @@
 import { defaultKeymap, historyKeymap } from '@codemirror/commands';
-import { Compartment, EditorState } from '@codemirror/state';
+import { Compartment, EditorSelection, EditorState } from '@codemirror/state';
 import { EditorView, drawSelection, keymap } from '@codemirror/view';
 import { normalise, type ConvertOptions } from '../engine';
+import { lastKeyOf, type TypedKey } from './composer';
+import { syllableBefore, type Syllable } from './inspect';
 import {
+  capsLockField,
   convertOptions,
   liveField,
   liveTyping,
@@ -19,6 +22,13 @@ export interface EditorStatus {
   echo: string;
   /** Unmapped letters of the latest keystroke. */
   unmapped: string[];
+  capsLock: boolean;
+  /** The key just typed, while its syllable is live. */
+  typedKey: TypedKey | null;
+  /** The written syllable before the cursor. */
+  syllable: Syllable | null;
+  /** True when this update changed the text. */
+  docChanged: boolean;
 }
 
 export interface PalakaEditor {
@@ -28,6 +38,10 @@ export interface PalakaEditor {
   setMode(mode: InputMode): void;
   toggleMode(): void;
   setOptions(options: ConvertOptions): void;
+  /** Inserts text at the cursor, replacing the selection. */
+  insert(text: string): void;
+  /** Replaces `expected` with `text` if it stands right before the cursor; otherwise just inserts `text`. */
+  replaceBefore(expected: string, text: string): void;
 }
 
 export interface EditorConfig {
@@ -37,11 +51,21 @@ export interface EditorConfig {
   onStatus?: (status: EditorStatus) => void;
 }
 
-const readStatus = (state: EditorState): EditorStatus => ({
-  mode: state.field(modeField),
-  echo: state.field(liveField)?.roman ?? '',
-  unmapped: state.field(unmappedField),
-});
+function readStatus(state: EditorState, docChanged: boolean): EditorStatus {
+  const live = state.field(liveField);
+  const { main } = state.selection;
+  const line = state.doc.lineAt(main.head);
+  const syllable = main.empty ? syllableBefore(line.text, main.head - line.from) : null;
+  return {
+    mode: state.field(modeField),
+    echo: live?.roman ?? '',
+    unmapped: state.field(unmappedField),
+    capsLock: state.field(capsLockField),
+    typedKey: live ? lastKeyOf(live.roman, state.facet(convertOptions)) : null,
+    syllable: syllable && { ...syllable, from: syllable.from + line.from, to: syllable.to + line.from },
+    docChanged,
+  };
+}
 
 export function createEditor(config: EditorConfig): PalakaEditor {
   const options = new Compartment();
@@ -66,12 +90,20 @@ export function createEditor(config: EditorConfig): PalakaEditor {
         }),
         EditorView.clipboardInputFilter.of((text) => normalise(text)),
         EditorView.updateListener.of((update) => {
-          if (update.transactions.length > 0) config.onStatus?.(readStatus(update.state));
+          if (update.transactions.length > 0) config.onStatus?.(readStatus(update.state, update.docChanged));
         }),
       ],
     }),
   });
-  config.onStatus?.(readStatus(view.state));
+  config.onStatus?.(readStatus(view.state, true));
+
+  const insert = (text: string, from: number, to: number) =>
+    view.dispatch({
+      changes: { from, to, insert: text },
+      selection: EditorSelection.cursor(from + text.length),
+      userEvent: 'input',
+      scrollIntoView: true,
+    });
 
   return {
     view,
@@ -86,6 +118,16 @@ export function createEditor(config: EditorConfig): PalakaEditor {
     toggleMode() {
       toggleMode(view);
       view.focus();
+    },
+    insert(text) {
+      const { main } = view.state.selection;
+      insert(text, main.from, main.to);
+    },
+    replaceBefore(expected, text) {
+      const { main } = view.state.selection;
+      const from = main.head - expected.length;
+      const stands = main.empty && from >= 0 && view.state.sliceDoc(from, main.head) === expected;
+      insert(text, stands ? from : main.from, main.to);
     },
     setOptions(next) {
       view.dispatch({ effects: options.reconfigure(convertOptions.of(next)) });

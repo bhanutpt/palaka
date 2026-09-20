@@ -9,12 +9,18 @@
     <header id="toolbar">
       <h1>పలక!</h1>
       <button id="mode-toggle" type="button" title="Switch between Telugu and English typing (Ctrl+Space)"></button>
+      <span class="toolbar-space"></span>
+      <button id="chart-toggle" type="button" aria-expanded="true" aria-controls="chart">Chart</button>
     </header>
     <main id="editor"></main>
+    <aside id="chart" aria-label="Character chart"></aside>
     <footer id="status" aria-live="polite">
       <span id="status-mode"></span>
       <span id="status-echo" title="Roman keys of the syllable being typed"></span>
+      <span id="status-cursor" title="Syllable before the cursor: roman spelling and Unicode code points"></span>
       <span id="status-warning"></span>
+      <span class="toolbar-space"></span>
+      <span id="status-counts"></span>
     </footer>
     <script type="module" src="/src/main.ts"></script>
   </body>

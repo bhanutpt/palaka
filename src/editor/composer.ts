@@ -72,3 +72,20 @@ export function backspace(current: Composition, options: ConvertOptions = {}): C
   const roman = current.roman.slice(0, -1);
   return roman === '' ? null : render(roman, options);
 }
+
+/** The key the writer has just typed, for lighting its tile in the chart. */
+export interface TypedKey {
+  key: string;
+  /** True when the key wrote a vowel sign onto a consonant rather than an independent vowel. */
+  asSign: boolean;
+}
+
+export function lastKeyOf(roman: string, options: ConvertOptions = {}): TypedKey | null {
+  const tokens = tokenize(roman, defaultScheme, options);
+  const last = tokens[tokens.length - 1];
+  if (!last || last.kind !== 'key') return null;
+  let before = tokens.length - 2;
+  while (before >= 0 && isBreak(tokens[before])) before--;
+  const onConsonant = before >= 0 && isConsonant(tokens[before]);
+  return { key: last.entry.key, asSign: onConsonant && last.entry.type === 'vowel' && !!last.entry.sign };
+}

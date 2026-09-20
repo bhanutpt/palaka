@@ -16,13 +16,19 @@ src/editor/
   composer.ts              pure: the syllable in progress, typeChar(), backspace()
   liveTyping.ts            CodeMirror extension: input handler, backspace, mode, syllable undo
   createEditor.ts          editor set-up, paste clean-up, status callback
-src/chart/                 phase 3: chart panel, guninta pop-up, search
-src/app/                   phase 4: shell, toolbar, status bar, settings, storage
+  inspect.ts               pure: the written syllable before the cursor, code points
+src/chart/
+  chartModel.ts            pure: sections and tiles from the mapping, guninta, search, tile lookup
+  chartPanel.ts            DOM: tiles, guninta panel, search box, highlights
+src/app/
+  statusBar.ts             mode, echo, cursor syllable, counts, warnings
+  styles.css               (phase 4 adds documents, settings, storage)
 src/help/                  phase 5: help page generated from the mapping
 tests/golden/              words.tsv (both directions), forward-only.tsv
 tests/engine/              golden, mapping, rule and round-trip property tests
-tests/editor/              composer tests
-tests/e2e/                 Playwright typing tests in a real browser
+tests/editor/              composer and inspector tests
+tests/chart/               chart model tests
+tests/e2e/                 Playwright typing and chart tests in a real browser
 scripts/                   validate-scheme.ts (build gate), gen-scheme-doc.ts
 ```
 
@@ -55,6 +61,14 @@ that is not its own (cursor move, click, paste, undo, Enter) clears the field, w
 buffer. Its edits carry an annotation that the undo history uses to group by syllable instead of by
 time. When a live pollu joins the following letter into one conjunct, the browser reports the next
 keystroke beyond that cluster; the position in the editor state wins.
+
+## Chart
+
+`chartModel.ts` turns the mapping into sections of tiles; nothing about the chart is written by hand,
+so a letter added to the mapping appears in the chart, the search and the guninta by itself. A tile
+inserts exactly what it shows. The editor reports the key just typed and the syllable before the
+cursor through one status callback; `main.ts` passes them to the chart and the status bar, so the
+chart and the editor never import each other.
 
 ## Dependency rule
 
