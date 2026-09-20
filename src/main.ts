@@ -2,8 +2,10 @@ import '@fontsource-variable/noto-sans-telugu';
 import '@fontsource-variable/noto-serif-telugu';
 import './app/styles.css';
 import { registerSW } from 'virtual:pwa-register';
+import { createConvertDialog } from './app/convertDialog';
 import { DocumentManager } from './app/documents';
 import { copyText, downloadText, readTextFile } from './app/files';
+import { createFindBar } from './app/findBar';
 import { applySettings, loadSettings, saveSettings } from './app/settings';
 import { createSettingsDialog } from './app/settingsDialog';
 import { createSidebar } from './app/sidebar';
@@ -11,6 +13,9 @@ import { createStatusBar } from './app/statusBar';
 import { DocumentStore } from './app/storage';
 import { createChartPanel } from './chart/chartPanel';
 import { createEditor, type PalakaEditor } from './editor/createEditor';
+import { createRomanPane } from './editor/romanPane';
+import { toRoman } from './engine';
+import { createHelpDialog } from './help/helpDialog';
 
 const byId = <T extends HTMLElement = HTMLElement>(id: string) => document.getElementById(id) as T;
 
@@ -42,9 +47,27 @@ const editor: PalakaEditor = createEditor({
     chart.setTyped(status.typedKey ? (status.typedKey.asSign ? 'sign:' : '') + status.typedKey.key : null);
     chart.setCursorText(status.typedKey ? '' : (status.syllable?.text ?? ''));
     statusBar.update(status, () => editor.getText());
+    if (!loading) findBar.refresh();
     if (status.docChanged && !loading) documents.textChanged();
   },
+  onDocChange: (update) => romanPane.teluguChanged(update),
+  onFind: () => findBar.open(),
+  onHelp: () => help.open(),
 });
+
+// Verification tools: split roman view, find and replace, bulk convert, help
+
+const romanPane = createRomanPane(byId('roman'), editor.view, () => editor.getOptions());
+const findBar = createFindBar(byId('find'), editor, (message) => statusBar.flash(message));
+const help = createHelpDialog(byId<HTMLDialogElement>('help'), () => settings.shortcut);
+const convertDialog = createConvertDialog(
+  byId<HTMLDialogElement>('convert'),
+  () => editor.getOptions(),
+  (telugu) => {
+    editor.insert(telugu);
+    editor.view.focus();
+  },
+);
 editor.setOptions({ teluguDigits: settings.teluguDigits });
 
 // Documents and autosave
@@ -55,6 +78,7 @@ const documents = new DocumentManager(new DocumentStore(), localStorage, {
     loading = true;
     editor.load(text);
     loading = false;
+    romanPane.refresh();
   },
 });
 loading = false;
@@ -102,6 +126,30 @@ byId('docs-toggle').addEventListener('click', (event) => {
   byId('documents').hidden = !document.body.classList.contains('documents-open');
 });
 
+const press = (button: HTMLElement, on: boolean) => button.setAttribute('aria-pressed', String(on));
+
+byId('split-toggle').addEventListener('click', (event) => {
+  const roman = byId('roman');
+  roman.hidden = !roman.hidden;
+  press(event.currentTarget as HTMLElement, !roman.hidden);
+  romanPane.setActive(!roman.hidden);
+  editor.view.focus();
+});
+byId('inspect-toggle').addEventListener('click', (event) => {
+  const button = event.currentTarget as HTMLElement;
+  const on = button.getAttribute('aria-pressed') !== 'true';
+  press(button, on);
+  editor.setInspector(on);
+  editor.view.focus();
+});
+byId('find-open').addEventListener('click', () => findBar.open());
+byId('convert-open').addEventListener('click', () => convertDialog.open());
+byId('help-open').addEventListener('click', () => help.open());
+byId('copy-roman').addEventListener('click', () => {
+  const roman = toRoman(editor.getSelectionOrAll(), editor.getOptions());
+  void copyText(roman).then((ok) => statusBar.flash(ok ? 'Roman copied' : 'Copy failed'));
+});
+
 byId('doc-new').addEventListener('click', () => void documents.create().then(() => editor.view.focus()));
 byId('doc-save').addEventListener('click', () => downloadText(documents.currentTitle, editor.getText()));
 byId('copy-all').addEventListener('click', () => {
@@ -125,6 +173,7 @@ const settingsDialog = createSettingsDialog(byId<HTMLDialogElement>('settings'),
   applySettings(settings);
   editor.setOptions({ teluguDigits: settings.teluguDigits });
   editor.setShortcut(settings.shortcut);
+  romanPane.refresh();
 });
 byId('settings-open').addEventListener('click', () => settingsDialog.open());
 

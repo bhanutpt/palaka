@@ -17,14 +17,35 @@
       <button id="doc-open" type="button">Open</button>
       <button id="doc-save" type="button" title="Save as a UTF-8 .txt file">Save</button>
       <button id="copy-all" type="button">Copy all</button>
+      <button id="copy-roman" type="button" title="Copy the roman spelling of the selection, or of the whole text">Copy roman</button>
       <button id="mode-toggle" type="button" title="Switch between Telugu and English typing"></button>
+      <button id="find-open" type="button" title="Find and replace (Ctrl+F)">Find</button>
+      <button id="convert-open" type="button" title="Convert a block of Palaka-HK text at once">Convert</button>
+      <button id="split-toggle" type="button" aria-pressed="false" title="Show the editable roman source below the text">Roman</button>
+      <button id="inspect-toggle" type="button" aria-pressed="false" title="Show hidden characters, stray signs and look-alike letters">Inspect</button>
       <span class="toolbar-space"></span>
       <button id="settings-open" type="button">Settings</button>
+      <button id="help-open" type="button" title="Help (F1)">Help</button>
       <button id="chart-toggle" type="button" aria-expanded="true" aria-controls="chart">Chart</button>
       <input id="file-input" type="file" accept=".txt,text/plain" hidden />
     </header>
     <aside id="documents" aria-label="Documents" hidden></aside>
-    <main id="editor"></main>
+    <div id="find" role="search" hidden>
+      <input id="find-text" type="search" placeholder="Find: Telugu or roman" aria-label="Find" autocapitalize="off" autocomplete="off" spellcheck="false" />
+      <span id="find-meaning" title="What is being searched for"></span>
+      <span id="find-count"></span>
+      <button id="find-previous" type="button">Previous</button>
+      <button id="find-next" type="button">Next</button>
+      <input id="find-replace" type="text" placeholder="Replace with" aria-label="Replace with" autocapitalize="off" autocomplete="off" spellcheck="false" />
+      <button id="find-replace-one" type="button">Replace</button>
+      <button id="find-replace-all" type="button">Replace all</button>
+      <label class="check" title="Read ASCII text in both fields as Palaka-HK"><input id="find-roman" type="checkbox" checked /> Palaka-HK</label>
+      <button id="find-close" type="button" aria-label="Close find">×</button>
+    </div>
+    <div id="panes">
+      <main id="editor"></main>
+      <section id="roman" aria-label="Roman source" hidden></section>
+    </div>
     <aside id="chart" aria-label="Character chart"></aside>
     <footer id="status" aria-live="polite">
       <span id="status-mode"></span>
@@ -73,6 +94,26 @@
         </label>
         <p class="settings-note">Everything is stored in this browser. Nothing is sent anywhere.</p>
         <button id="settings-close" type="submit">Close</button>
+      </form>
+    </dialog>
+
+    <dialog id="convert" aria-labelledby="convert-title">
+      <form method="dialog">
+        <h2 id="convert-title">Convert Palaka-HK text</h2>
+        <textarea id="convert-roman" rows="6" placeholder="Paste or type roman text: nEnu telugu rAstunnAnu" autocapitalize="off" autocomplete="off" spellcheck="false"></textarea>
+        <div id="convert-preview" lang="te" aria-live="polite"></div>
+        <p id="convert-warning" class="settings-note"></p>
+        <div class="dialog-actions">
+          <button id="convert-insert" type="submit">Insert at the cursor</button>
+          <button type="submit">Cancel</button>
+        </div>
+      </form>
+    </dialog>
+
+    <dialog id="help" aria-label="Help">
+      <form method="dialog">
+        <div id="help-body"></div>
+        <div class="dialog-actions"><button id="help-close" type="submit">Close</button></div>
       </form>
     </dialog>
 

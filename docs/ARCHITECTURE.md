@@ -17,6 +17,10 @@ src/editor/
   liveTyping.ts            CodeMirror extension: input handler, backspace, mode, syllable undo
   createEditor.ts          editor set-up, paste clean-up, status callback
   inspect.ts               pure: the written syllable before the cursor, code points
+  inspector.ts             pure: invisible characters, stray signs, look-alike letters in a line
+  findModel.ts             pure: query interpretation (Telugu or roman), matching, replacement
+  editorTools.ts           CodeMirror side of the inspector and of find: decorations, commands
+  romanPane.ts             split view: second editor mirrored line by line
 src/chart/
   chartModel.ts            pure: sections and tiles from the mapping, guninta, search, tile lookup
   chartPanel.ts            DOM: tiles, guninta panel, search box, highlights
@@ -28,7 +32,10 @@ src/app/
   sidebar.ts, settingsDialog.ts, statusBar.ts   small DOM components
   styles.css               light and dark palettes as custom properties
 public/                    app icons
-src/help/                  phase 5: help page generated from the mapping
+src/help/
+  rules.ts                 the rules and example inputs, shared with docs/SCHEME.md
+  helpModel.ts             pure: help content built from the mapping
+  helpDialog.ts            DOM
 tests/golden/              words.tsv (both directions), forward-only.tsv
 tests/engine/              golden, mapping, rule and round-trip property tests
 tests/editor/              composer and inspector tests
@@ -75,6 +82,16 @@ so a letter added to the mapping appears in the chart, the search and the gunint
 inserts exactly what it shows. The editor reports the key just typed and the syllable before the
 cursor through one status callback; `main.ts` passes them to the chart and the status bar, so the
 chart and the editor never import each other.
+
+## Verification tools
+
+Conversion never crosses a line break in either direction, so the Telugu text and its roman source
+always have the same lines. The split view relies on that: an edit in one pane is carried over by
+converting only the lines it touched, marked with an annotation so that it is not echoed back, and
+kept out of the other pane's undo history.
+
+The inspector and find follow the usual split: `inspector.ts` and `findModel.ts` are pure and unit
+tested; `editorTools.ts` turns their results into CodeMirror decorations and commands.
 
 ## Documents and offline
 

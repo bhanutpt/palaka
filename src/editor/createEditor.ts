@@ -1,8 +1,9 @@
 import { defaultKeymap, historyKeymap } from '@codemirror/commands';
 import { Compartment, EditorSelection, EditorState } from '@codemirror/state';
-import { EditorView, drawSelection, keymap } from '@codemirror/view';
+import { EditorView, drawSelection, keymap, type ViewUpdate } from '@codemirror/view';
 import { normalise, type ConvertOptions } from '../engine';
 import { lastKeyOf, type TypedKey } from './composer';
+import { findField, inspector } from './editorTools';
 import { syllableBefore, type Syllable } from './inspect';
 import {
   capsLockField,
@@ -28,6 +29,8 @@ export interface EditorStatus {
   typedKey: TypedKey | null;
   /** The written syllable before the cursor. */
   syllable: Syllable | null;
+  /** The selected text (the start of it, if it is long), for showing its roman spelling. */
+  selection: string;
   /** True when this update changed the text. */
   docChanged: boolean;
 }
@@ -43,6 +46,11 @@ export interface PalakaEditor {
   setShortcut(key: string): void;
   /** Replaces the whole text and starts a fresh undo history; mode and settings are kept. */
   load(text: string): void;
+  /** Shows or hides invisible characters, stray signs and look-alike letters. */
+  setInspector(on: boolean): void;
+  /** The selected text, or the whole text when nothing is selected. */
+  getSelectionOrAll(): string;
+  getOptions(): ConvertOptions;
   /** Inserts text at the cursor, replacing the selection. */
   insert(text: string): void;
   /** Replaces `expected` with `text` if it stands right before the cursor; otherwise just inserts `text`. */
@@ -54,7 +62,15 @@ export interface EditorConfig {
   doc?: string;
   shortcut?: string;
   onStatus?: (status: EditorStatus) => void;
+  /** Every update that changed the text; the split view follows these. */
+  onDocChange?: (update: ViewUpdate) => void;
+  /** Ctrl+F or Ctrl+H was pressed. */
+  onFind?: () => void;
+  /** F1 was pressed. */
+  onHelp?: () => void;
 }
+
+const SELECTION_PREVIEW = 400;
 
 function readStatus(state: EditorState, docChanged: boolean): EditorStatus {
   const live = state.field(liveField);
@@ -68,6 +84,7 @@ function readStatus(state: EditorState, docChanged: boolean): EditorStatus {
     capsLock: state.field(capsLockField),
     typedKey: live ? lastKeyOf(live.roman, state.facet(convertOptions)) : null,
     syllable: syllable && { ...syllable, from: syllable.from + line.from, to: syllable.to + line.from },
+    selection: state.sliceDoc(main.from, Math.min(main.to, main.from + SELECTION_PREVIEW)),
     docChanged,
   };
 }
@@ -75,6 +92,8 @@ function readStatus(state: EditorState, docChanged: boolean): EditorStatus {
 export function createEditor(config: EditorConfig): PalakaEditor {
   const options = new Compartment();
   const shortcut = new Compartment();
+  const inspecting = new Compartment();
+  let inspectorOn = false;
   let currentOptions: ConvertOptions = {};
   let currentShortcut = config.shortcut ?? 'Ctrl-Space';
 
@@ -85,6 +104,13 @@ export function createEditor(config: EditorConfig): PalakaEditor {
         liveTyping(),
         options.of(convertOptions.of(currentOptions)),
         shortcut.of(modeShortcut(currentShortcut)),
+        inspecting.of(inspectorOn ? inspector : []),
+        findField,
+        keymap.of([
+          { key: 'Mod-f', run: () => (config.onFind?.(), true) },
+          { key: 'Mod-h', run: () => (config.onFind?.(), true) },
+          { key: 'F1', run: () => (config.onHelp?.(), true) },
+        ]),
         keymap.of([...defaultKeymap, ...historyKeymap]),
         drawSelection(),
         EditorView.lineWrapping,
@@ -98,6 +124,7 @@ export function createEditor(config: EditorConfig): PalakaEditor {
         }),
         EditorView.clipboardInputFilter.of((text) => normalise(text)),
         EditorView.updateListener.of((update) => {
+          if (update.docChanged) config.onDocChange?.(update);
           if (update.transactions.length > 0) config.onStatus?.(readStatus(update.state, update.docChanged));
         }),
       ],
@@ -146,6 +173,15 @@ export function createEditor(config: EditorConfig): PalakaEditor {
       currentShortcut = key;
       view.dispatch({ effects: shortcut.reconfigure(modeShortcut(key)) });
     },
+    setInspector(on) {
+      inspectorOn = on;
+      view.dispatch({ effects: inspecting.reconfigure(on ? inspector : []) });
+    },
+    getSelectionOrAll() {
+      const { main } = view.state.selection;
+      return main.empty ? view.state.doc.toString() : view.state.sliceDoc(main.from, main.to);
+    },
+    getOptions: () => currentOptions,
     load(text) {
       const mode = view.state.field(modeField);
       view.setState(createState(text));

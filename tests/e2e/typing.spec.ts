@@ -1,15 +1,7 @@
-import { expect, test, type Page } from '@playwright/test';
-import { editor, text } from './helpers';
+import { expect, test } from '@playwright/test';
+import { editor, paste, text } from './helpers';
 
 const ZWNJ = String.fromCharCode(0x200c);
-
-async function paste(page: Page, data: string) {
-  await editor(page).evaluate((el, value) => {
-    const clipboardData = new DataTransfer();
-    clipboardData.setData('text/plain', value);
-    el.dispatchEvent(new ClipboardEvent('paste', { clipboardData, bubbles: true, cancelable: true }));
-  }, data);
-}
 
 test.beforeEach(async ({ page }) => {
   await page.goto('/');

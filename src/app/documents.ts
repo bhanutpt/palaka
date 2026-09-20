@@ -60,6 +60,8 @@ export class DocumentManager {
   private current: StoredDocument;
   private timer: ReturnType<typeof setTimeout> | undefined;
   private saving: Promise<void> = Promise.resolve();
+  /** Names as last written, to tell a rename from no change. */
+  private readonly storedName = new Map<string, string>();
 
   constructor(store: DocumentStore, local: KeyValueStore, editor: EditorPort) {
     this.store = store;
@@ -78,6 +80,7 @@ export class DocumentManager {
 
   async start(): Promise<void> {
     this.documents = await this.store.list();
+    for (const d of this.documents) this.storedName.set(d.id, d.name);
     const wanted = this.local.getItem(CURRENT_KEY);
     this.current = this.documents.find((d) => d.id === wanted) ?? this.documents[0] ?? this.current;
 
@@ -205,13 +208,17 @@ export class DocumentManager {
     const document = this.current;
     const text = this.editor.getText();
     const known = this.documents.includes(document);
+    const changed = text !== document.text || document.name !== this.storedName.get(document.id);
     if (text !== document.text) {
       document.text = text;
       document.updatedAt = Date.now();
     }
 
-    if (this.isStorable(document)) {
+    if (known && !changed) {
+      // Nothing new: no need to write.
+    } else if (this.isStorable(document)) {
       await this.store.put(document);
+      this.storedName.set(document.id, document.name);
       if (!known) this.documents.push(document);
       this.documents.sort(newestFirst);
     } else if (known) {

@@ -2,6 +2,24 @@
 
 ## Unreleased
 
+### Phase 5: verification tools
+
+- Split view: an editable roman pane under the text. The two stay in step line by line, in both
+  directions; the roman pane keeps what was typed there and is made canonical when it loses the focus.
+- Reverse conversion: a selection shows its roman spelling in the status bar; Copy roman copies the
+  spelling of the selection or of the whole text.
+- Text inspector: invisible characters (ZWNJ, ZWJ, ZWSP, NBSP, BOM …) appear as labels; a pollu, vowel
+  sign or sign with nothing to stand on, and letters of another script inside a Telugu word (Kannada
+  look-alikes, a Latin o) are marked, each with an explanation.
+- Find and replace (Ctrl+F) that accepts Telugu or roman and shows the Telugu it is really looking
+  for. A roman syllable matches that syllable only (`ka` is not the క in కా); a bare consonant (`k`)
+  matches all its forms, and replacing it keeps the vowels (k to g turns కాకి into గాగి). Replace all
+  is one undo step.
+- Bulk convert: paste a block of Palaka-HK text, check the preview and the unmapped letters, insert.
+- Help (F1), generated from the mapping: every key, the rules, examples computed by the engine. The
+  rules text is shared with docs/SCHEME.md.
+- Tests: inspector, find and help model unit tests; 11 new Playwright tests.
+
 ### Phase 4: documents and offline
 
 - Autosave to IndexedDB after a pause in typing, with a Saved/Edited indicator. When a tab closes, the

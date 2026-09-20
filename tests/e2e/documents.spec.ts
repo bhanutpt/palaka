@@ -23,14 +23,14 @@ test('text survives a tab that is closed straight after typing', async ({ page, 
 
   const again = await context.newPage();
   await again.goto('/');
-  await expect(again.locator('.cm-line').first()).toHaveText('పలక');
+  await expect(again.locator('#editor .cm-line').first()).toHaveText('పలక');
 });
 
 test('documents: new, switch, rename, delete', async ({ page }) => {
   await page.keyboard.type('okaTi');
   await saved(page);
   await page.locator('#doc-new').click();
-  expect(await text(page)).toBe('');
+  await expect(page.locator('#editor .cm-line')).toHaveText(['']);
   await page.keyboard.type('reMDu');
   await saved(page);
 
@@ -39,7 +39,7 @@ test('documents: new, switch, rename, delete', async ({ page }) => {
   await expect(page.locator('.doc-item.is-current .doc-title')).toHaveText('రెండు');
 
   await page.locator('.doc-item', { hasText: 'ఒకటి' }).locator('.doc-open').click();
-  expect(await text(page)).toBe('ఒకటి');
+  await expect(page.locator('#editor .cm-line')).toHaveText(['ఒకటి']);
 
   // Undo must not reach into the document that was open before.
   await page.keyboard.press('Control+z');
@@ -52,7 +52,7 @@ test('documents: new, switch, rename, delete', async ({ page }) => {
   page.once('dialog', (dialog) => dialog.accept());
   await page.locator('.doc-item.is-current .doc-delete').click();
   await expect(page.locator('.doc-item .doc-title')).toHaveText(['రెండు']);
-  expect(await text(page)).toBe('రెండు');
+  await expect(page.locator('#editor .cm-line')).toHaveText(['రెండు']);
 
   await page.reload();
   expect(await text(page)).toBe('రెండు');
@@ -65,7 +65,7 @@ test('opens a .txt file, cleaned up, as a new document', async ({ page }) => {
     mimeType: 'text/plain',
     buffer: Buffer.from(`\uFEFFపాఠం\r\n${twoPartAi}`, 'utf8'),
   });
-  await expect(page.locator('.cm-line')).toHaveText(['పాఠం', 'కై']);
+  await expect(page.locator('#editor .cm-line')).toHaveText(['పాఠం', 'కై']);
   await page.locator('#docs-toggle').click();
   await expect(page.locator('.doc-item.is-current .doc-title')).toHaveText('lesson.txt');
 });
@@ -95,14 +95,14 @@ test('settings: theme, font and size apply at once and persist', async ({ page }
   await page.locator('#set-font-size').blur();
 
   await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
-  await expect(page.locator('.cm-scroller')).toHaveCSS('font-size', '28px');
-  await expect(page.locator('.cm-scroller')).toHaveCSS('font-family', /Noto Serif Telugu/);
+  await expect(page.locator('#editor .cm-scroller')).toHaveCSS('font-size', '28px');
+  await expect(page.locator('#editor .cm-scroller')).toHaveCSS('font-family', /Noto Serif Telugu/);
   const background = await page.locator('body').evaluate((el) => getComputedStyle(el).backgroundColor);
   expect(background).not.toBe('rgb(251, 250, 247)');
 
   await page.reload();
   await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
-  await expect(page.locator('.cm-scroller')).toHaveCSS('font-size', '28px');
+  await expect(page.locator('#editor .cm-scroller')).toHaveCSS('font-size', '28px');
 });
 
 test('settings: Telugu digits and the mode-switch shortcut', async ({ page }) => {
@@ -148,7 +148,7 @@ test('the app is installable and loads with the network switched off', async ({ 
 
   await context.setOffline(true);
   await page.reload();
-  await expect(page.locator('.cm-line').first()).toHaveText('పలక');
+  await expect(page.locator('#editor .cm-line').first()).toHaveText('పలక');
   await expect(page.locator('[data-tile="k"]')).toBeVisible();
   await page.evaluate(() => document.fonts.ready);
   expect(await page.evaluate(() => document.fonts.check("20px 'Noto Sans Telugu Variable'", 'తెలుగు'))).toBe(true);

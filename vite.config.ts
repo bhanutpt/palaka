@@ -31,6 +31,6 @@ export default defineConfig({
     }),
   ],
   test: {
-    include: ['tests/{engine,editor,chart,app}/**/*.test.ts'],
+    include: ['tests/{engine,editor,chart,app,help}/**/*.test.ts'],
   },
 });

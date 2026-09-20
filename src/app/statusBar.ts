@@ -4,6 +4,12 @@ import { codePointsOf } from '../editor/inspect';
 
 const COUNT_DELAY_MS = 250;
 const FLASH_MS = 2000;
+const ROMAN_PREVIEW = 80;
+
+const shorten = (text: string) => {
+  const line = text.replace(/\n/g, ' ');
+  return line.length > ROMAN_PREVIEW ? line.slice(0, ROMAN_PREVIEW) + '…' : line;
+};
 
 export interface StatusBar {
   update(status: EditorStatus, getText: () => string): void;
@@ -45,10 +51,11 @@ export function createStatusBar(root: HTMLElement): StatusBar {
       mode.textContent = status.mode === 'telugu' ? 'Palaka-HK' : 'English';
       echo.textContent = status.echo;
 
+      // A selection shows its roman spelling; otherwise the syllable before the cursor is explained.
       const syllable = status.syllable?.text ?? '';
-      cursor.textContent = syllable.trim()
-        ? `${syllable}  ${toRoman(syllable)}  ${codePointsOf(syllable).join(' ')}`
-        : '';
+      if (status.selection) cursor.textContent = shorten(toRoman(status.selection));
+      else if (syllable.trim()) cursor.textContent = `${syllable}  ${toRoman(syllable)}  ${codePointsOf(syllable).join(' ')}`;
+      else cursor.textContent = '';
 
       const warnings: string[] = [];
       if (status.capsLock && status.mode === 'telugu') warnings.push('Caps Lock is on');
