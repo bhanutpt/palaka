@@ -9,8 +9,8 @@ export default defineConfig({
       registerType: 'autoUpdate',
       includeAssets: ['icon.svg', 'icon-192.png', 'icon-512.png'],
       manifest: {
-        name: 'పలక! — Palaka',
-        short_name: 'పలక!',
+        name: 'పలక — Palaka',
+        short_name: 'పలక',
         description: 'A Telugu writing slate: type Palaka-HK roman, get exact Telugu Unicode. Works offline.',
         lang: 'te',
         display: 'standalone',

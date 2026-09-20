@@ -135,7 +135,10 @@ test('the bundled Telugu fonts are used, from this site only', async ({ page }) 
 
 test('the app is installable and loads with the network switched off', async ({ page, context }) => {
   const manifest = await (await page.request.get('/manifest.webmanifest')).json();
-  expect(manifest).toMatchObject({ name: 'పలక! — Palaka', display: 'standalone' });
+  expect(manifest).toMatchObject({ name: 'పలక — Palaka', short_name: 'పలక', display: 'standalone' });
+  // The name is plain పలక wherever the app shows it: the heading and the title of the window.
+  await expect(page.locator('#toolbar h1')).toHaveText('పలక');
+  expect(await page.title()).toMatch(/ — పలక$/);
   expect(manifest.icons.map((icon: { sizes: string }) => icon.sizes)).toEqual(expect.arrayContaining(['192x192', '512x512']));
 
   await page.keyboard.type('palaka');

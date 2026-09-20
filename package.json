@@ -1,6 +1,6 @@
 {
   "name": "palaka",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "private": true,
   "description": "పలక! (Palaka): a Telugu writing slate. Type Palaka-HK roman, get exact Telugu Unicode.",
   "license": "MIT",

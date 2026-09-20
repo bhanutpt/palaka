@@ -107,7 +107,7 @@ const sidebar = createSidebar({
 documents.onChange = () => {
   sidebar.render(documents.list());
   statusBar.setSaved(documents.saved);
-  document.title = `${documents.currentTitle} — పలక!`;
+  document.title = `${documents.currentTitle} — పలక`;
 };
 
 // A closing tab may not wait for IndexedDB, so the text also goes into a synchronous draft.

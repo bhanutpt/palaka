@@ -1,6 +1,11 @@
 # Changelog
 
-## Unreleased
+## 1.0.0 — 2026-09-21
+
+The first release: Palaka-HK 1.0.0 and the complete writing slate, phases 0 to 6 of docs/PLAN.md.
+
+- The app calls itself పలక, without the exclamation mark, in its heading, its window title and its
+  installed name.
 
 ### Phase 6: polish and release
 
