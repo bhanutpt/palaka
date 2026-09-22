@@ -22,8 +22,15 @@ export interface StatusBar {
 
 const MODE_LABEL: Record<EditorStatus['mode'], string> = {
   telugu: 'Palaka-HK',
-  trvk: 'TRVK',
+  // The tilde is the whole point: this is the one mode in the app that guesses.
+  trvk: 'TRVK ~',
   english: 'English',
+};
+
+const MODE_TITLE: Record<EditorStatus['mode'], string> = {
+  telugu: 'Palaka-HK: every letter is exactly what you typed',
+  trvk: 'TRVK: loose roman, corrected by the model — it guesses, and is sometimes wrong',
+  english: 'English: the keys are left as they are',
 };
 
 /** Character count in code points (line breaks excluded) and word count. */
@@ -61,6 +68,7 @@ export function createStatusBar(root: HTMLElement): StatusBar {
     },
     update(status, getText) {
       mode.textContent = MODE_LABEL[status.mode];
+      mode.title = MODE_TITLE[status.mode];
       echo.textContent = status.echo;
 
       // A selection shows its roman spelling; otherwise the syllable before the cursor is explained.

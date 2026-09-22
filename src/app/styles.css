@@ -488,6 +488,24 @@ body.chart-hidden #chart {
   }
 }
 
+/* TRVK mode: a word the model has just changed on its own is underlined for a moment, so the
+   change is seen rather than noticed later. Reduced motion keeps the mark and drops the fade. */
+.cm-trvk-corrected {
+  text-decoration: underline dotted 2px var(--accent);
+  text-underline-offset: 4px;
+  animation: trvk-fade 1.6s ease-out forwards;
+}
+
+@keyframes trvk-fade {
+  0%,
+  60% {
+    text-decoration-color: var(--accent);
+  }
+  100% {
+    text-decoration-color: transparent;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,

@@ -22,7 +22,7 @@ async function enableTrvk(page: Page) {
 async function intoTrvk(page: Page) {
   await editor(page).click();
   await page.locator('#mode-toggle').click();
-  await expect(page.locator('#status-mode')).toHaveText('TRVK');
+  await expect(page.locator('#status-mode')).toHaveText('TRVK ~');
   await expect(page.locator('body')).toHaveAttribute('data-trvk', 'ready', { timeout: MODEL_TIMEOUT });
 }
 

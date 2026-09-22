@@ -20,7 +20,7 @@ import {
   type Extension,
   type TransactionSpec,
 } from '@codemirror/state';
-import { EditorView, keymap } from '@codemirror/view';
+import { Decoration, EditorView, keymap, type DecorationSet } from '@codemirror/view';
 import { convert, type ConvertOptions } from '../engine';
 import { naive } from '../trvk/naive';
 import {
@@ -48,6 +48,31 @@ const DEBOUNCE_MS = 40;
 /** Marks a transaction as TRVK mode's own, so that the ring is carried rather than locked. */
 const setRing = StateEffect.define<Ring>();
 
+/** A word the model has just changed under the writer's eyes, and the end of that mark. */
+const markCorrected = StateEffect.define<{ from: number; to: number }>();
+const clearCorrected = StateEffect.define<null>();
+
+/** How long the mark stays before it fades. */
+const MARK_MS = 1600;
+
+const correctedMark = Decoration.mark({ class: 'cm-trvk-corrected' });
+
+/**
+ * A word that changed after it was typed is easy to miss. It is underlined for a moment, so
+ * that the writer sees the model at work rather than text moving on its own.
+ */
+export const correctedField = StateField.define<DecorationSet>({
+  create: () => Decoration.none,
+  update(marks, tr) {
+    for (const effect of tr.effects) {
+      if (effect.is(clearCorrected)) return Decoration.none;
+      if (effect.is(markCorrected)) return Decoration.set([correctedMark.range(effect.value.from, effect.value.to)]);
+    }
+    return marks.map(tr.changes);
+  },
+  provide: (field) => EditorView.decorations.from(field),
+});
+
 const render = (hk: string, options: ConvertOptions): string => convert(hk, options).text;
 
 /**
@@ -71,8 +96,8 @@ export const trvkField = StateField.define<Ring>({
   },
 });
 
-/** The field and the mode it depends on; enough to work with TRVK state in a test. */
-export const trvkState = (): Extension => [modeField, trvkField];
+/** The fields and the mode they depend on; enough to work with TRVK state in a test. */
+export const trvkState = (): Extension => [modeField, trvkField, correctedField];
 
 /** The word being typed, when the cursor still sits right after its rendered Telugu. */
 function continuing(state: EditorState, ring: Ring, cursor: number): boolean {
@@ -250,11 +275,13 @@ export function applyTrvkResult(state: EditorState, request: TrvkRequest, hk: st
   const { from, to, insert } = step.change;
   const head = state.selection.main.head;
   const delta = insert.length - (to - from);
+  // Only the second pass is marked: the word being typed changes under the cursor anyway.
+  const marks = request.pass === 'final' ? [markCorrected.of({ from, to: from + insert.length })] : [];
   return {
     changes: step.change,
     // The word being typed sits after the one corrected: the cursor moves with it.
     selection: state.selection.main.empty && head >= to ? EditorSelection.cursor(head + delta) : undefined,
-    effects: [setRing.of(step.ring)],
+    effects: [setRing.of(step.ring), ...marks],
     // Its own undo step, so one undo puts back what the writer had before the correction.
     annotations: [syllableEdit.of('start')],
     userEvent: 'input',
@@ -275,6 +302,7 @@ export interface TrvkTypingConfig {
 /** TRVK mode: the input handler, the debounce and the model call. */
 export function trvkTyping(config: TrvkTypingConfig): Extension {
   let timer: ReturnType<typeof setTimeout> | undefined;
+  let markTimer: ReturnType<typeof setTimeout> | undefined;
 
   const ask = async (view: EditorView) => {
     if (!config.ready() || view.state.field(modeField) !== 'trvk') return;
@@ -286,7 +314,12 @@ export function trvkTyping(config: TrvkTypingConfig): Extension {
       try {
         const hk = await config.correct(request.text);
         const spec = applyTrvkResult(view.state, request, hk);
-        if (spec) view.dispatch(spec);
+        if (!spec) continue;
+        view.dispatch(spec);
+        if (request.pass === 'final') {
+          clearTimeout(markTimer);
+          markTimer = setTimeout(() => view.dispatch({ effects: clearCorrected.of(null) }), MARK_MS);
+        }
       } catch (error) {
         config.onError?.(error instanceof Error ? error.message : String(error));
         return;
@@ -326,6 +359,7 @@ export function trvkTyping(config: TrvkTypingConfig): Extension {
 
   return [
     trvkField,
+    correctedField,
     EditorView.inputHandler.of((view, _from, _to, text) => {
       if (view.state.field(modeField) !== 'trvk') return false;
       // Another input method (IME, a system keyboard) is at work: leave it alone.

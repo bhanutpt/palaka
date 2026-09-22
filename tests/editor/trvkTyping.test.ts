@@ -4,6 +4,7 @@ import { setMode } from '../../src/editor/liveTyping';
 import {
   applyTrvkResult,
   backspaceInTrvk,
+  correctedField,
   trvkField,
   trvkRequests,
   trvkState,
@@ -184,6 +185,18 @@ describe('a correction coming back from the model', () => {
     const state = answer(typed, 'nEnu', (request) => request.pass === 'final');
     expect(ring(state).words[0].locked).toBe(true);
     expect(trvkRequests(ring(state), {}).some((request) => request.index === 0)).toBe(false);
+  });
+
+  it('underlines a word it changed after the writer had moved on', () => {
+    const typed = type(editor(), 'nenu eeroju');
+    const state = answer(typed, 'nEnu', (request) => request.pass === 'final');
+    expect(state.field(correctedField).size).toBe(1);
+  });
+
+  it('underlines nothing while the word is still being typed', () => {
+    const typed = type(editor(), 'nenu');
+    const state = answer(typed, 'nEnu');
+    expect(state.field(correctedField).size).toBe(0);
   });
 
   it('is dropped when the word changed while the request was in flight', () => {
