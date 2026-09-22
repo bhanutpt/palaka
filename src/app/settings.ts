@@ -12,10 +12,17 @@ export interface Settings {
   teluguDigits: boolean;
   /** CodeMirror key name of the Telugu/English switch. */
   shortcut: string;
+  /** TRVK mode: loose roman corrected by the model. Off until the writer asks for it. */
+  trvk: boolean;
+  /** Correct a word once more when the next word appears. */
+  trvkRecorrect: boolean;
+  /** Words of context the model is given on each side. */
+  trvkContext: number;
 }
 
 export const SHORTCUTS = ['Ctrl-Space', 'Ctrl-.', 'F9'] as const;
 export const FONT_SIZE = { min: 14, max: 40 } as const;
+export const TRVK_CONTEXT = { min: 1, max: 3 } as const;
 
 export const DEFAULT_SETTINGS: Settings = {
   theme: 'system',
@@ -24,6 +31,9 @@ export const DEFAULT_SETTINGS: Settings = {
   fontSize: 20,
   teluguDigits: false,
   shortcut: 'Ctrl-Space',
+  trvk: false,
+  trvkRecorrect: true,
+  trvkContext: 3,
 };
 
 const KEY = 'palaka.settings';
@@ -43,6 +53,7 @@ export function loadSettings(store: KeyValueStore): Settings {
   }
   const d = DEFAULT_SETTINGS;
   const size = typeof raw.fontSize === 'number' && Number.isFinite(raw.fontSize) ? raw.fontSize : d.fontSize;
+  const context = typeof raw.trvkContext === 'number' && Number.isFinite(raw.trvkContext) ? raw.trvkContext : d.trvkContext;
   return {
     theme: oneOf<Theme>(raw.theme, ['system', 'light', 'dark'], d.theme),
     font: oneOf<FontChoice>(raw.font, ['sans', 'serif', 'custom'], d.font),
@@ -50,6 +61,9 @@ export function loadSettings(store: KeyValueStore): Settings {
     fontSize: Math.min(FONT_SIZE.max, Math.max(FONT_SIZE.min, Math.round(size))),
     teluguDigits: raw.teluguDigits === true,
     shortcut: oneOf<string>(raw.shortcut, SHORTCUTS, d.shortcut),
+    trvk: raw.trvk === true,
+    trvkRecorrect: raw.trvkRecorrect !== false,
+    trvkContext: Math.min(TRVK_CONTEXT.max, Math.max(TRVK_CONTEXT.min, Math.round(context))),
   };
 }
 

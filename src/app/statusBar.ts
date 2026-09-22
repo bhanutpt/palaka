@@ -16,7 +16,15 @@ export interface StatusBar {
   setSaved(saved: boolean): void;
   /** Shows a short message (Copied …) that fades by itself. */
   flash(message: string): void;
+  /** What the TRVK model is doing: nothing, downloading, ready, or not available here. */
+  setModel(text: string): void;
 }
+
+const MODE_LABEL: Record<EditorStatus['mode'], string> = {
+  telugu: 'Palaka-HK',
+  trvk: 'TRVK',
+  english: 'English',
+};
 
 /** Character count in code points (line breaks excluded) and word count. */
 export function countText(text: string): { characters: number; words: number } {
@@ -35,6 +43,7 @@ export function createStatusBar(root: HTMLElement): StatusBar {
   const warning = field('status-warning');
   const savedField = field('status-saved');
   const message = field('status-message');
+  const model = field('status-model');
   let timer: number | undefined;
   let flashTimer: number | undefined;
 
@@ -42,13 +51,16 @@ export function createStatusBar(root: HTMLElement): StatusBar {
     setSaved(saved) {
       savedField.textContent = saved ? 'Saved' : 'Edited';
     },
+    setModel(text) {
+      model.textContent = text;
+    },
     flash(text) {
       message.textContent = text;
       window.clearTimeout(flashTimer);
       flashTimer = window.setTimeout(() => (message.textContent = ''), FLASH_MS);
     },
     update(status, getText) {
-      mode.textContent = status.mode === 'telugu' ? 'Palaka-HK' : 'English';
+      mode.textContent = MODE_LABEL[status.mode];
       echo.textContent = status.echo;
 
       // A selection shows its roman spelling; otherwise the syllable before the cursor is explained.
@@ -58,7 +70,7 @@ export function createStatusBar(root: HTMLElement): StatusBar {
       else cursor.textContent = '';
 
       const warnings: string[] = [];
-      if (status.capsLock && status.mode === 'telugu') warnings.push('Caps Lock is on');
+      if (status.capsLock && status.mode !== 'english') warnings.push('Caps Lock is on');
       if (status.unmapped.length > 0) warnings.push(`Not a Palaka-HK key: ${status.unmapped.join(' ')}`);
       warning.textContent = warnings.join(' · ');
 

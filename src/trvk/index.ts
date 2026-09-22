@@ -57,6 +57,15 @@ export class TrvkModel {
   }
 
   /**
+   * The URL of one model file. A relative base is resolved against the page, not against the
+   * worker's own script, which is where it would otherwise land.
+   */
+  private url(name: string): string {
+    const here = globalThis.location?.href;
+    return here ? new URL(this.base + name, here).href : this.base + name;
+  }
+
+  /**
    * Downloads the runtime and the model and opens the session. Resolves false instead of
    * throwing when that cannot be done: the mode reports itself unavailable and the app is
    * exactly as it was. One load per model, however often it is called.
@@ -96,10 +105,10 @@ export class TrvkModel {
       this.send({
         type: 'load',
         id,
-        model: `${this.base}model.int8.onnx`,
-        vocab: `${this.base}vocab.json`,
-        wasmPaths: `${this.base}ort/`,
-        wasmBinary: `${this.base}ort/ort-wasm-simd-threaded.wasm`,
+        model: this.url('model.int8.onnx'),
+        vocab: this.url('vocab.json'),
+        wasmPaths: this.url('ort/'),
+        wasmBinary: this.url('ort/ort-wasm-simd-threaded.wasm'),
       });
     });
     return this.loading;

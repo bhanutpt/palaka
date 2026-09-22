@@ -10,6 +10,7 @@ import {
   convertOptions,
   liveField,
   liveTyping,
+  modeCycle,
   modeField,
   modeShortcut,
   setMode,
@@ -17,10 +18,11 @@ import {
   unmappedField,
   type InputMode,
 } from './liveTyping';
+import { trvkField, trvkTyping, type TrvkTypingConfig } from './trvkTyping';
 
 export interface EditorStatus {
   mode: InputMode;
-  /** Roman keys of the syllable in progress. */
+  /** Roman keys of the syllable in progress; in TRVK mode, the loose roman of the word. */
   echo: string;
   /** Unmapped letters of the latest keystroke. */
   unmapped: string[];
@@ -44,6 +46,8 @@ export interface PalakaEditor {
   setOptions(options: ConvertOptions): void;
   /** Changes the key of the Telugu/English switch (a CodeMirror key name such as Ctrl-Space). */
   setShortcut(key: string): void;
+  /** The modes the switch cycles through; TRVK is only in it when the writer asked for it. */
+  setModes(modes: readonly InputMode[]): void;
   /** Replaces the whole text and starts a fresh undo history; mode and settings are kept. */
   load(text: string): void;
   /** Shows or hides invisible characters, stray signs and look-alike letters. */
@@ -68,9 +72,17 @@ export interface EditorConfig {
   onFind?: () => void;
   /** F1 was pressed. */
   onHelp?: () => void;
+  /** TRVK mode: how to reach the model. Without it the mode does not exist. */
+  trvk?: TrvkTypingConfig;
 }
 
 const SELECTION_PREVIEW = 400;
+
+/** The loose roman of the word being typed in TRVK mode. */
+function trvkEcho(state: EditorState): string {
+  const ring = state.field(trvkField, false);
+  return ring?.words[ring.words.length - 1]?.raw ?? '';
+}
 
 function readStatus(state: EditorState, docChanged: boolean): EditorStatus {
   const live = state.field(liveField);
@@ -79,7 +91,7 @@ function readStatus(state: EditorState, docChanged: boolean): EditorStatus {
   const syllable = main.empty ? syllableBefore(line.text, main.head - line.from) : null;
   return {
     mode: state.field(modeField),
-    echo: live?.roman ?? '',
+    echo: state.field(modeField) === 'trvk' ? trvkEcho(state) : (live?.roman ?? ''),
     unmapped: state.field(unmappedField),
     capsLock: state.field(capsLockField),
     typedKey: live ? lastKeyOf(live.roman, state.facet(convertOptions)) : null,
@@ -93,6 +105,8 @@ export function createEditor(config: EditorConfig): PalakaEditor {
   const options = new Compartment();
   const shortcut = new Compartment();
   const inspecting = new Compartment();
+  const modes = new Compartment();
+  let currentModes: readonly InputMode[] = ['telugu', 'english'];
   let inspectorOn = false;
   let currentOptions: ConvertOptions = {};
   let currentShortcut = config.shortcut ?? 'Ctrl-Space';
@@ -102,6 +116,8 @@ export function createEditor(config: EditorConfig): PalakaEditor {
       doc: normalise(doc),
       extensions: [
         liveTyping(),
+        config.trvk ? trvkTyping(config.trvk) : [],
+        modes.of(modeCycle.of(currentModes)),
         options.of(convertOptions.of(currentOptions)),
         shortcut.of(modeShortcut(currentShortcut)),
         inspecting.of(inspectorOn ? inspector : []),
@@ -172,6 +188,14 @@ export function createEditor(config: EditorConfig): PalakaEditor {
     setShortcut(key) {
       currentShortcut = key;
       view.dispatch({ effects: shortcut.reconfigure(modeShortcut(key)) });
+    },
+    setModes(next) {
+      currentModes = next;
+      const effects = [modes.reconfigure(modeCycle.of(next))];
+      // A mode that has just been taken away cannot stay switched on.
+      const mode = view.state.field(modeField);
+      if (!next.includes(mode)) effects.push(setMode.of(next[0]));
+      view.dispatch({ effects });
     },
     setInspector(on) {
       inspectorOn = on;

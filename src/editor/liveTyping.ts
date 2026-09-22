@@ -13,7 +13,7 @@ import { EditorView, keymap } from '@codemirror/view';
 import type { ConvertOptions } from '../engine';
 import { backspace, typeChar, type Composition } from './composer';
 
-export type InputMode = 'telugu' | 'english';
+export type InputMode = 'telugu' | 'trvk' | 'english';
 
 /** The live syllable and where its rendered text starts in the document. */
 export interface LiveSyllable extends Composition {
@@ -29,8 +29,17 @@ export const setMode = StateEffect.define<InputMode>();
 const setLive = StateEffect.define<LiveSyllable | null>();
 const setUnmapped = StateEffect.define<string[]>();
 
-/** Marks our own edits so that the undo history groups them by syllable, not by time. */
-const syllableEdit = Annotation.define<'start' | 'continue'>();
+/** Marks our own edits so that the undo history groups them by syllable, not by time.
+ *  TRVK mode uses it too, so that one word, or one correction, is one undo step. */
+export const syllableEdit = Annotation.define<'start' | 'continue'>();
+
+/**
+ * The modes the switch cycles through. TRVK is only in it when the writer has turned the
+ * mode on in the settings, so nothing about the model exists for anyone else.
+ */
+export const modeCycle = Facet.define<readonly InputMode[], readonly InputMode[]>({
+  combine: (values) => values[0] ?? ['telugu', 'english'],
+});
 
 export const modeField = StateField.define<InputMode>({
   create: () => 'telugu',
@@ -175,8 +184,9 @@ function handleBackspace(view: EditorView): boolean {
 }
 
 export function toggleMode(view: EditorView): boolean {
-  const next: InputMode = view.state.field(modeField) === 'telugu' ? 'english' : 'telugu';
-  view.dispatch({ effects: setMode.of(next) });
+  const cycle = view.state.facet(modeCycle);
+  const index = cycle.indexOf(view.state.field(modeField));
+  view.dispatch({ effects: setMode.of(cycle[(index + 1) % cycle.length]) });
   return true;
 }
 

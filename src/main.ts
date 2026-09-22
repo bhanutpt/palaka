@@ -17,6 +17,7 @@ import { createEditor, type PalakaEditor } from './editor/createEditor';
 import { createRomanPane } from './editor/romanPane';
 import { toRoman } from './engine';
 import { createHelpDialog } from './help/helpDialog';
+import { TrvkModel } from './trvk';
 
 const byId = <T extends HTMLElement = HTMLElement>(id: string) => document.getElementById(id) as T;
 
@@ -25,6 +26,36 @@ applySettings(settings);
 
 const statusBar = createStatusBar(byId('status'));
 const modeToggle = byId('mode-toggle');
+
+// TRVK mode: nothing is downloaded, and no worker exists, until the writer switches the mode
+// on for the first time. A failed load leaves the app exactly as it was.
+const megabytes = (bytes: number) => (bytes / 1e6).toFixed(1);
+const trvk = new TrvkModel({
+  onState(state, error) {
+    if (state === 'ready') {
+      statusBar.setModel(`TRVK ready`);
+      window.setTimeout(() => trvk.state === 'ready' && statusBar.setModel(''), 3000);
+    } else if (state === 'unavailable') {
+      statusBar.setModel('TRVK unavailable');
+      statusBar.flash(`TRVK could not start: ${error ?? 'unknown reason'}`);
+      // The mode cannot work without it, so the writer goes back to typing Palaka-HK.
+      // Deferred: this can arrive while the editor is in the middle of an update.
+      window.setTimeout(() => editor.setMode('telugu'), 0);
+    } else if (state === 'idle') {
+      statusBar.setModel('');
+    }
+  },
+  onProgress(loaded, total) {
+    statusBar.setModel(`Downloading TRVK ${megabytes(loaded)} / ${megabytes(total)} MB`);
+  },
+});
+
+const MODE_LABEL = { telugu: 'తెలుగు', trvk: 'TRVK', english: 'English' } as const;
+const MODE_TITLE = {
+  telugu: 'తెలుగు: typing Telugu in Palaka-HK',
+  trvk: 'TRVK: typing loose roman, corrected as you type',
+  english: 'English: typing English',
+} as const;
 
 // The chart is created first; its callbacks only run on a click, when the editor exists.
 // On a narrow screen the chart is a drawer that slides up from the bottom; it starts closed.
@@ -47,10 +78,17 @@ let loading = true;
 const editor: PalakaEditor = createEditor({
   parent: byId('editor'),
   shortcut: settings.shortcut,
+  trvk: {
+    correct: (text) => trvk.correct(text),
+    ready: () => trvk.state === 'ready',
+    recorrect: () => settings.trvkRecorrect,
+    context: () => settings.trvkContext,
+  },
   onStatus(status) {
-    const telugu = status.mode === 'telugu';
-    modeToggle.textContent = telugu ? 'తెలుగు' : 'English';
-    modeToggle.setAttribute('aria-label', telugu ? 'తెలుగు: typing Telugu' : 'English: typing English');
+    modeToggle.textContent = MODE_LABEL[status.mode];
+    modeToggle.setAttribute('aria-label', MODE_TITLE[status.mode]);
+    // The first switch into TRVK mode is what starts the download.
+    if (status.mode === 'trvk' && trvk.state === 'idle') void trvk.load();
 
     chart.editorChanged();
     chart.setTyped(status.typedKey ? (status.typedKey.asSign ? 'sign:' : '') + status.typedKey.key : null);
@@ -63,6 +101,13 @@ const editor: PalakaEditor = createEditor({
   onFind: () => findBar.open(),
   onHelp: () => help.open(),
 });
+
+/** TRVK joins the typing switch when the writer asks for it, and gives up its worker when
+ *  they take it away again. */
+function applyTrvkSetting(): void {
+  editor.setModes(settings.trvk ? ['telugu', 'trvk', 'english'] : ['telugu', 'english']);
+  if (!settings.trvk) trvk.terminate();
+}
 
 // Verification tools: split roman view, find and replace, bulk convert, help
 
@@ -78,6 +123,7 @@ const convertDialog = createConvertDialog(
   },
 );
 editor.setOptions({ teluguDigits: settings.teluguDigits });
+applyTrvkSetting();
 
 // Documents and autosave
 
@@ -205,6 +251,7 @@ const settingsDialog = createSettingsDialog(byId<HTMLDialogElement>('settings'),
   applySettings(settings);
   editor.setOptions({ teluguDigits: settings.teluguDigits });
   editor.setShortcut(settings.shortcut);
+  applyTrvkSetting();
   romanPane.refresh();
 });
 byId('settings-open').addEventListener('click', () => settingsDialog.open());

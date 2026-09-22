@@ -19,7 +19,7 @@
         <button id="doc-save" type="button" title="Save as a UTF-8 .txt file">Save</button>
         <button id="copy-all" type="button">Copy all</button>
         <button id="copy-roman" type="button" title="Copy the roman spelling of the selection, or of the whole text">Copy roman</button>
-        <button id="mode-toggle" type="button" title="Switch between Telugu and English typing"></button>
+        <button id="mode-toggle" type="button" title="Switch typing mode"></button>
         <button id="find-open" type="button" title="Find and replace (Ctrl+F)">Find</button>
         <button id="convert-open" type="button" title="Convert a block of Palaka-HK text at once">Convert</button>
         <button id="split-toggle" type="button" aria-pressed="false" title="Show the editable roman source below the text">Roman</button>
@@ -58,6 +58,7 @@
       <span id="status-mode"></span>
       <span id="status-echo" title="Roman keys of the syllable being typed"></span>
       <span id="status-cursor" title="Syllable before the cursor: roman spelling and Unicode code points"></span>
+      <span id="status-model" role="status" title="What the TRVK model is doing"></span>
       <span id="status-warning" role="status"></span>
       <span class="toolbar-space"></span>
       <span id="status-message" role="status"></span>
@@ -92,6 +93,26 @@
           <input id="set-digits" type="checkbox" />
           Type Telugu digits (0–9 become ౦–౯)
         </label>
+        <fieldset id="set-trvk-group">
+          <legend>TRVK: loose roman, corrected as you type</legend>
+          <label class="check">
+            <input id="set-trvk" type="checkbox" />
+            Add TRVK to the typing switch
+          </label>
+          <p class="settings-note">
+            Type Telugu the roman way you would in a chat message and a small model on this
+            device writes Palaka-HK for it, which the usual engine turns into Telugu. It is
+            often wrong on names and English words; switch to Palaka-HK to fix those key by
+            key. Nothing is sent anywhere, and the first switch-on downloads about 5 MB.
+          </p>
+          <label class="check">
+            <input id="set-trvk-recorrect" type="checkbox" />
+            Correct a word once more when the next word appears
+          </label>
+          <label>Words of context
+            <input id="set-trvk-context" type="number" min="1" max="3" step="1" />
+          </label>
+        </fieldset>
         <label>Telugu/English switch
           <select id="set-shortcut">
             <option value="Ctrl-Space">Ctrl+Space</option>
