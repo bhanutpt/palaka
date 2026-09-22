@@ -6,17 +6,18 @@
   "license": "MIT",
   "type": "module",
   "scripts": {
-    "dev": "vite",
+    "dev": "npm run trvk:runtime && vite",
     "validate:scheme": "tsx scripts/validate-scheme.ts",
     "docs:scheme": "tsx scripts/gen-scheme-doc.ts",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",
-    "build": "npm run validate:scheme && tsc --noEmit && vite build",
+    "build": "npm run trvk:runtime && npm run validate:scheme && tsc --noEmit && vite build",
     "preview": "vite preview",
     "check": "npm run lint && npm run typecheck && npm test && npm run build && npm run test:e2e",
-    "test:e2e": "playwright test"
+    "test:e2e": "playwright test",
+    "trvk:runtime": "tsx scripts/copy-trvk-runtime.ts"
   },
   "devDependencies": {
     "@axe-core/playwright": "^4.13.0",
@@ -38,6 +39,7 @@
     "@codemirror/state": "^6.7.5",
     "@codemirror/view": "^6.43.12",
     "@fontsource-variable/noto-sans-telugu": "^5.3.0",
-    "@fontsource-variable/noto-serif-telugu": "^5.3.0"
+    "@fontsource-variable/noto-serif-telugu": "^5.3.0",
+    "onnxruntime-web": "^1.23.0"
   }
 }

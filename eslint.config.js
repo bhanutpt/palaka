@@ -2,7 +2,9 @@ import js from '@eslint/js';
 import tseslint from 'typescript-eslint';
 
 export default tseslint.config(
-  { ignores: ['dist', 'dev-dist', 'coverage', 'node_modules'] },
+  // public/trvk/ort holds the ONNX Runtime files copied out of node_modules; they are
+  // vendor code, not ours.
+  { ignores: ['dist', 'dev-dist', 'coverage', 'node_modules', 'public/trvk/ort'] },
   js.configs.recommended,
   ...tseslint.configs.recommended,
   {

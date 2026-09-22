@@ -1,0 +1,72 @@
+{
+ "name": "trvk-v1",
+ "inputs": {
+  "ids": "int64 [batch, length]",
+  "mask": "float32 [batch, length], 1 for a real character"
+ },
+ "outputs": {
+  "logits": "float32 [batch, length, n_labels]"
+ },
+ "model": {
+  "n_chars": 86,
+  "n_labels": 220,
+  "d_model": 192,
+  "n_layers": 4,
+  "n_heads": 4,
+  "d_ff": 768,
+  "dropout": 0.1,
+  "max_len": 96
+ },
+ "n_params": 1857244,
+ "vocab": "vocab.json",
+ "markers": {
+  "target_open": "\\u0002",
+  "target_close": "\\u0003"
+ },
+ "files": {
+  "fp32": {
+   "path": "model.onnx",
+   "bytes": 7460965,
+   "sha256": "8e200f3cada4f18a92a060b3adafb93f918bb6ff636ca5812ca13b472fc87aae"
+  },
+  "int8": {
+   "path": "model.int8.onnx",
+   "bytes": 1954562,
+   "sha256": "f29298bce74606b816d1a30c7241139e25b94050b951e1f783d5dba5f2ad4a02"
+  },
+  "vocab": {
+   "path": "vocab.json",
+   "bytes": 2790,
+   "sha256": "afa5657928199ed0e1aa0a91a8afa710aca83a36ab5a9eb821b9edd9df0f47a9"
+  }
+ },
+ "checkpoint": "experiments\\tagger_v1\\model.pt",
+ "step": 60000,
+ "dev": {
+  "word_acc": 0.9125,
+  "char_acc": 0.9895,
+  "step": 60000,
+  "seconds": 2480
+ },
+ "opset": 17,
+ "parity": {
+  "fp32": {
+   "windows": 5000,
+   "label_agreement": 1.0,
+   "target_agreement": 1.0,
+   "max_abs_logit_diff": 0.0,
+   "ort_ms_per_window": 2.388,
+   "torch_word_acc": 0.9062,
+   "onnx_word_acc": 0.9062
+  },
+  "int8": {
+   "windows": 5000,
+   "label_agreement": 0.99951,
+   "target_agreement": 0.9938,
+   "max_abs_logit_diff": 1.3353,
+   "ort_ms_per_window": 1.559,
+   "torch_word_acc": 0.9062,
+   "onnx_word_acc": 0.9054
+  }
+ }
+}
