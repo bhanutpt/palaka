@@ -6,7 +6,9 @@ the scheme is in [docs/SCHEME.md](docs/SCHEME.md); the structure is in [docs/ARC
 
 ## Commands
 
-- `npm test` runs the unit tests: engine, composer, chart model, documents, settings.
+- `npm test` runs the unit tests: engine, composer, chart model, documents, settings, TRVK. It
+  copies the ONNX Runtime files first, because the TRVK parity test runs the shipped model in Node
+  and `public/trvk/ort/` is gitignored — without the copy the test fails on a fresh clone.
 - `npm run test:e2e` builds, then runs the Playwright tests against the production build
   (installed Edge locally, Chromium in CI).
 - `npm run lint`, `npm run typecheck`
