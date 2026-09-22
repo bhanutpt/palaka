@@ -32,6 +32,8 @@ const modeToggle = byId('mode-toggle');
 const megabytes = (bytes: number) => (bytes / 1e6).toFixed(1);
 const trvk = new TrvkModel({
   onState(state, error) {
+    // Also on the page, so that a test — and a stylesheet — can see what the model is doing.
+    document.body.dataset.trvk = state;
     if (state === 'ready') {
       statusBar.setModel(`TRVK ready`);
       window.setTimeout(() => trvk.state === 'ready' && statusBar.setModel(''), 3000);

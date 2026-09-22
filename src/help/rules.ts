@@ -15,3 +15,12 @@ export const RULES: string[] = [
 export const EXAMPLES: string[] = [
   'palaka', 'telugu', 'dEzaM', 'kRSNa', 'jJAnaM', 'gurraM', 'ceTTu', 'sAphT^vEr', 'a_i', 'k_ha', 'l_R', 'idi `PDF` kAdu',
 ];
+
+/** TRVK mode in words, for the help page. It is off until the writer turns it on. */
+export const TRVK_NOTES: string[] = [
+  '**TRVK** (తెలుగు రోమన్ వ్యావహారిక క్రమం) is the loose roman spelling people actually type: `nenu eeroju intiki vellanu`. Switch the mode on in the settings and the typing switch gains a third position between Telugu and English.',
+  'In that mode a small model on this device reads what you type and writes **Palaka-HK** for it, which the usual engine turns into Telugu. Nothing is guessed about Telugu itself: every letter on screen still comes from the engine, and the roman pane reads it back as it always did.',
+  'A word is corrected while you type it, and once more when the next word appears — the neighbours are what decide `kada` between కద and కడ. After that it is left alone. A word you edit yourself is never touched again.',
+  'It is often wrong on names, English words and chat-style forms. That is the point of the two modes: draft loosely in TRVK, then switch to Palaka-HK and fix what is wrong key by key, with the exact behaviour this app has always had.',
+  'The first switch-on downloads about 5 MB (the model and the runtime that runs it) from this site — nothing is sent anywhere, ever, and after that first download the mode works offline like the rest of the app.',
+];

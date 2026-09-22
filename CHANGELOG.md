@@ -1,5 +1,29 @@
 # Changelog
 
+## 1.1.0 — 2026-09-22
+
+TRVK mode: type the loose roman people actually use and a small model on the device writes
+Palaka-HK for it, which the untouched engine turns into Telugu. Off by default; phase 4 of the
+plan in the `trvk` repository.
+
+- A third position on the typing switch, added only when the mode is turned on under *Settings →
+  TRVK*. The status bar shows `TRVK`, the loose roman of the word being typed, and what the model
+  is doing, including the megabytes as they arrive on the first switch-on.
+- The rule table renders every word the moment it is typed, so the screen never lags behind the
+  fingers; the model's answer replaces it about 40 ms later. A word is corrected once more when its
+  successor appears — the neighbours are what decide `kada` between కద and కడ — and then left
+  alone. A word edited by any other means is never touched again.
+- The model (1.9 MB, int8) and ONNX Runtime Web are served from this site, loaded in a Web Worker
+  on the first switch-on and cached for offline use from then on. They are deliberately left out of
+  the precache: nobody pays 5 MB for a mode they have not asked for.
+- Hard rule 5 is amended: Palaka-HK mode still has no dictionary, no prediction and no guessing.
+  TRVK mode is the one exception, opt-in and visibly marked, and it still makes no request to
+  another origin.
+- Tests: 104 new unit tests (the ports against the fixture the Python export recorded, the model
+  client, the keystroke rules), a parity test that runs the shipped model in Node and reproduces
+  the Palaka-HK of all 700 recorded windows, and 7 Playwright tests including the offline promise
+  and the same-origin promise.
+
 ## 1.0.0 — 2026-09-21
 
 The first release: Palaka-HK 1.0.0 and the complete writing slate, phases 0 to 6 of docs/PLAN.md.

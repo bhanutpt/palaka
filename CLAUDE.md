@@ -10,7 +10,8 @@ the scheme is in [docs/SCHEME.md](docs/SCHEME.md); the structure is in [docs/ARC
 - `npm run test:e2e` builds, then runs the Playwright tests against the production build
   (installed Edge locally, Chromium in CI).
 - `npm run lint`, `npm run typecheck`
-- `npm run build` validates the scheme, type-checks and builds the static site.
+- `npm run build` copies the ONNX Runtime files TRVK needs, validates the scheme, type-checks and
+  builds the static site. `npm run trvk:runtime` does the copy on its own.
 - `npm run check` runs all of the above; run it at the end of every phase.
 - `npm run docs:scheme` regenerates docs/SCHEME.md from the mapping file.
 
@@ -19,14 +20,20 @@ the scheme is in [docs/SCHEME.md](docs/SCHEME.md); the structure is in [docs/ARC
 1. `scheme/palaka-hk.json` is the single source of truth. The engine, the chart, the help page,
    docs/SCHEME.md and the mapping tests are all driven by it. Never hard-code a key or a letter elsewhere.
 2. The engine (`src/engine`) is pure TypeScript: no DOM, no imports from `src/editor`, `src/chart`,
-   `src/app` or `src/help`. ESLint enforces this. It exports `toTelugu(roman)` and `toRoman(telugu)`.
+   `src/app`, `src/help` or `src/trvk`. ESLint enforces this. It exports `toTelugu(roman)` and
+   `toRoman(telugu)`. `src/trvk` may use the engine and nothing else of the app, so the model layer
+   stays swappable and removable.
 3. Tokenise by longest match. Consonant + vowel gives the vowel sign; consonant + consonant gives a
    conjunct through the virama; a consonant followed by anything else gets a visible virama. `_` splits
    keys and outputs nothing (it does not end the syllable: `l_R` is లృ). `^` outputs ZWNJ. `__` closes
    the syllable. Text inside backticks passes through unchanged.
 4. `toTelugu(toRoman(t))` equals `t` for all NFC text. The property tests prove it; never weaken them.
-5. No dictionary, no prediction, no phonetic guessing, no network calls. The app is static, works
-   offline and stores everything in the browser.
+5. In Palaka-HK mode: no dictionary, no prediction, no phonetic guessing, no network calls. The app
+   is static, works offline and stores everything in the browser. **TRVK mode is the one exception**:
+   an opt-in, visibly marked mode whose model reads loose roman and outputs Palaka-HK, which the
+   untouched engine converts. It never runs unless switched on in the settings, it runs on the
+   device, and it never makes a request to another origin. Everything in the document is still
+   engine output.
 6. Unmapped characters pass through unchanged and raise a status-bar warning; nothing is silently dropped.
 7. The editor field disables autocapitalize, autocorrect and spellcheck, and leaves IME composition alone.
 

@@ -64,6 +64,13 @@ export function createHelpDialog(dialog: HTMLDialogElement, getShortcut: () => s
     }
     parts.push(rules);
 
+    parts.push(el('h3', 'TRVK mode'));
+    for (const note of help.trvk) {
+      const paragraph = el('p');
+      paragraph.append(...rich(note));
+      parts.push(paragraph);
+    }
+
     parts.push(el('h3', 'In the editor'));
     parts.push(table(['Key', 'What it does'], help.tips.map((t) => [el('kbd', t.keys), t.action])));
 

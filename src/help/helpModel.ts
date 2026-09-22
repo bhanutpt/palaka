@@ -1,6 +1,6 @@
 import { buildChart, type ChartSection } from '../chart/chartModel';
 import { toTelugu, type SchemeData } from '../engine';
-import { EXAMPLES, RULES } from './rules';
+import { EXAMPLES, RULES, TRVK_NOTES } from './rules';
 
 /** Everything the help page shows, generated from the mapping file. No DOM. */
 export interface HelpContent {
@@ -9,6 +9,8 @@ export interface HelpContent {
   /** The chart sections, reused as the scheme tables: key, letter and note of every entry. */
   sections: ChartSection[];
   rules: string[];
+  /** TRVK mode explained; shown whether or not the writer has turned it on. */
+  trvk: string[];
   examples: { roman: string; telugu: string }[];
   tips: { keys: string; action: string }[];
 }
@@ -22,9 +24,10 @@ export function buildHelp(data: SchemeData, shortcut = 'Ctrl+Space'): HelpConten
     ],
     sections: buildChart(data),
     rules: RULES,
+    trvk: TRVK_NOTES,
     examples: EXAMPLES.map((roman) => ({ roman, telugu: toTelugu(roman) })),
     tips: [
-      { keys: shortcut, action: 'switch between Telugu and English typing' },
+      { keys: shortcut, action: 'switch the typing mode: Telugu, then TRVK when it is on, then English' },
       { keys: 'Backspace', action: 'removes one roman key while a syllable is being typed, and one code point afterwards' },
       { keys: 'Ctrl+Z', action: 'undo, one syllable at a time' },
       { keys: 'Ctrl+F', action: 'find and replace; type the search in Telugu or in roman' },

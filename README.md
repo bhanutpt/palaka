@@ -39,10 +39,40 @@ text between backticks stays as it is. The whole scheme, with every key and rule
   UTF-8 `.txt`, copy all.
 - **Comfort**: light and dark themes, bundled Noto Sans and Noto Serif Telugu, font size, Telugu
   digits, a choice of key for the Telugu/English switch.
+- **TRVK mode** (off by default): type the loose roman you would use in a chat message and a small
+  model on your device writes Palaka-HK for it, which the same engine turns into Telugu. See below.
 - **Offline**: installable as an app; after the first visit it starts with no network at all.
 - **Accessible**: everything works from the keyboard (F6 moves between the text and the chart, the
   arrow keys walk the toolbar, Escape goes back to the text), controls are labelled for screen
   readers, and both themes meet WCAG AA contrast.
+
+## TRVK: loose roman, corrected as you type
+
+**TRVK** (తెలుగు రోమన్ వ్యావహారిక క్రమం, "Telugu roman as it is used") is the spelling people actually
+type. Palaka-HK asks you to know that `nEnu` has a long `E`; TRVK lets you type `nenu` and have the
+app work it out:
+
+| Typed loosely | On screen |
+| --- | --- |
+| `nenu eeroju intiki vellanu` | నేను ఈరోజు ఇంటికి వేళ్ళను |
+| `manchi telugu pusthakam` | మంచి తెలుగు పుస్తకం |
+
+Switch it on under *Settings → TRVK*; the typing switch then cycles Telugu → TRVK → English. A word
+is corrected while you type it and once more when the next word appears, because the neighbours are
+often what decide the spelling. A word you go back and edit yourself is never touched again.
+
+What it is not: a system that is always right. It is wrong often enough on names, English words and
+chat-style forms that the two modes belong together — **draft loosely in TRVK, then switch to
+Palaka-HK and fix what is wrong, key by key**, with exactly the behaviour this app has always had.
+Palaka-HK mode is unchanged: no dictionary, no prediction, no guessing.
+
+How it works, and what it costs: a 1.9 MB character tagger (a small transformer, trained on Telugu
+Wikipedia romanised by Palaka's own converter plus a noise model, and measured against Google's
+Dakshina romanisations) runs in a Web Worker through ONNX Runtime Web. The model reads loose roman
+and writes Palaka-HK — never Telugu, which only the engine writes. The first switch-on downloads
+about 5 MB from this site, most of it the runtime; after that the mode works offline like the rest
+of the app. Nothing is ever sent anywhere: there is no request to any other origin, and the
+Playwright tests assert it. The model and how it was trained live in a separate repository, `trvk`.
 
 ## Use it
 

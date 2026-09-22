@@ -16,6 +16,12 @@ describe('buildHelp', () => {
     expect(help.examples[0]).toEqual({ roman: 'palaka', telugu: 'పలక' });
   });
 
+  it('explains TRVK mode, and says plainly what it does not promise', () => {
+    expect(help.trvk.length).toBeGreaterThanOrEqual(4);
+    expect(help.trvk.join(' ')).toMatch(/Palaka-HK/);
+    expect(help.trvk.join(' ')).toMatch(/wrong/);
+  });
+
   it('carries the scheme version, the rules and the current shortcut', () => {
     expect(help.title).toBe(`Palaka-HK ${schemeData.version}`);
     expect(help.rules.length).toBeGreaterThanOrEqual(9);

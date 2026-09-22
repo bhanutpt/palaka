@@ -15,12 +15,22 @@ src/engine/                pure functions, no DOM
 src/editor/
   composer.ts              pure: the syllable in progress, typeChar(), backspace()
   liveTyping.ts            CodeMirror extension: input handler, backspace, mode, syllable undo
+  trvkTyping.ts            TRVK mode: the keystroke rules as pure functions, the debounce, the calls
   createEditor.ts          editor set-up, paste clean-up, status callback
   inspect.ts               pure: the written syllable before the cursor, code points
   inspector.ts             pure: invisible characters, stray signs, look-alike letters in a line
   findModel.ts             pure: query interpretation (Telugu or roman), matching, replacement
   editorTools.ts           CodeMirror side of the inspector and of find: decorations, commands
   romanPane.ts             split view: second editor mirrored line by line
+src/trvk/                  TRVK mode's model; may import the engine, nothing else of the app
+  tokens.ts                pure: vocabulary, character ids, the label decode back to Palaka-HK
+  windowing.ts             pure: the window cut around one word, as the training data was cut
+  naive.ts                 pure: the rule table that renders a word before the model answers
+  ring.ts                  pure: the recent word ring, the lock rules, the stale-reply check
+  protocol.ts              the messages between the page and the worker
+  worker.ts                ONNX Runtime Web session, argmax, decode; one window per request
+  index.ts                 TrvkModel: idle until asked, then loading, ready or unavailable
+public/trvk/               the int8 model, its vocabulary and manifest; ort/ is copied at build
 src/chart/
   chartModel.ts            pure: sections and tiles from the mapping, guninta, search, tile lookup
   chartPanel.ts            DOM: tiles, guninta panel, search box, highlights
@@ -39,7 +49,8 @@ src/help/
   helpDialog.ts            DOM
 tests/golden/              words.tsv (both directions), forward-only.tsv
 tests/engine/              golden, mapping, rule and round-trip property tests
-tests/editor/              composer and inspector tests
+tests/editor/              composer, inspector and TRVK keystroke tests
+tests/trvk/                the ports against the Python fixture, the model client, real-model parity
 tests/chart/               chart model tests
 tests/app/                 document manager (fake-indexeddb) and settings tests
 tests/e2e/                 Playwright tests in a real browser: typing, chart, documents, tools, and
