@@ -14,13 +14,30 @@ export default tseslint.config(
         {
           patterns: [
             {
-              group: ['**/editor', '**/editor/**', '**/chart', '**/chart/**', '**/app', '**/app/**', '**/help', '**/help/**'],
-              message: 'src/engine must not import from the editor, chart, app or help layers.',
+              group: ['**/editor', '**/editor/**', '**/chart', '**/chart/**', '**/app', '**/app/**', '**/help', '**/help/**', '**/trvk', '**/trvk/**'],
+              message: 'src/engine must not import from the editor, chart, app, help or trvk layers.',
             },
           ],
         },
       ],
       'no-restricted-globals': ['error', 'window', 'document', 'navigator', 'localStorage', 'indexedDB'],
+    },
+  },
+  {
+    // TRVK may use the engine and nothing else of the app: the model layer stays swappable.
+    files: ['src/trvk/**/*.ts'],
+    rules: {
+      'no-restricted-imports': [
+        'error',
+        {
+          patterns: [
+            {
+              group: ['**/editor', '**/editor/**', '**/chart', '**/chart/**', '**/app', '**/app/**', '**/help', '**/help/**'],
+              message: 'src/trvk must not import from the editor, chart, app or help layers.',
+            },
+          ],
+        },
+      ],
     },
   },
 );
